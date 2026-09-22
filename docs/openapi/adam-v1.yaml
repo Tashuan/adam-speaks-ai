@@ -6,6 +6,69 @@ info:
 servers:
   - url: https://adam-speaks.com/api
 paths:
+  /v1/account/avatars:
+    get:
+      summary: List avatars owned by the authenticated Adam user
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/FirebaseAuth'
+      responses:
+        '200':
+          description: Owned account avatars
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [avatars]
+                properties:
+                  avatars:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AccountAvatar'
+        '401':
+          $ref: '#/components/responses/Error'
+  /v1/account/avatars/{avatarId}:
+    get:
+      summary: Read an owned account avatar
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/FirebaseAuth'
+        - $ref: '#/components/parameters/AvatarId'
+      responses:
+        '200':
+          description: Account avatar
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  avatar:
+                    $ref: '#/components/schemas/AccountAvatar'
+        '401':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+    patch:
+      summary: Update an owned account avatar
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/FirebaseAuth'
+        - $ref: '#/components/parameters/AvatarId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountAvatarUpdateRequest'
+      responses:
+        '200':
+          description: Updated account avatar
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
   /v1/oauth/register:
     post:
       summary: Register a minimally scoped dynamic agent client
@@ -222,6 +285,17 @@ components:
       in: path
       required: true
       schema: { type: string }
+    AvatarId:
+      name: avatarId
+      in: path
+      required: true
+      schema: { type: string }
+    FirebaseAuth:
+      name: Authorization
+      in: header
+      required: true
+      description: Firebase ID token using the Bearer scheme.
+      schema: { type: string }
     InstallationKey:
       name: X-Installation-Key
       in: header
@@ -240,6 +314,38 @@ components:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
   schemas:
+    AccountAvatarUpdateRequest:
+      type: object
+      properties:
+        displayName: { type: string, maxLength: 2000 }
+        description: { type: string, maxLength: 2000 }
+        voiceId: { type: string, nullable: true, maxLength: 200 }
+        greeting: { type: string, maxLength: 2000 }
+        personality: { type: string, maxLength: 2000 }
+        allowedOrigins:
+          type: array
+          minItems: 1
+          maxItems: 10
+          items: { type: string, format: uri }
+    AccountAvatar:
+      type: object
+      required: [avatarId, workspaceId, ownership, speechMode]
+      properties:
+        avatarId: { type: string }
+        workspaceId: { type: string }
+        installationId: { type: string, nullable: true }
+        displayName: { type: string }
+        description: { type: string }
+        templateId: { type: string, nullable: true }
+        runtimeConfigRef: { type: string, nullable: true }
+        status: { type: string }
+        ownership: { type: string, enum: [claimed, provisional] }
+        speechMode: { type: string, enum: [mock, live] }
+        entitlements: { type: object, additionalProperties: true }
+        allowedOrigins: { type: array, items: { type: string, format: uri } }
+        voiceId: { type: string, nullable: true }
+        greeting: { type: string }
+        personality: { type: string }
     DynamicAgentClientRequest:
       type: object
       required: [client_name, idempotency_key]

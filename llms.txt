@@ -17,6 +17,7 @@ Adam is an embeddable, remote-controllable real-time talking avatar for websites
 - Quickstart: docs/ai/QUICKSTART.md
 - Authentication: docs/ai/AUTHENTICATION.md
 - Provisioning: docs/ai/PROVISIONING.md
+- Account avatar management: docs/ai/ACCOUNT_AVATARS.md
 - Embedding: docs/ai/EMBEDDING.md
 - Speech sources: docs/ai/SPEECH_SOURCES.md
 - MCP: docs/ai/MCP.md

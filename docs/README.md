@@ -5,7 +5,7 @@ Adam connects websites, applications, AI systems, and live experiences to a real
 ## Start here
 
 - [Agent integration prompt](./ai/AGENT_PROMPT.md) — the recommended behavior for an agent asked to add Adam.
-- [AI quickstart](./ai/QUICKSTART.md) — authenticate, provision, embed, and speak.
+- [AI quickstart](./ai/QUICKSTART.md) — bootstrap an agent, register a user, embed, and speak.
 - [Integration guide](./INTEGRATION.md) — choose the right path for a website, existing AI, or agent.
 - [MCP server guide](./MCP.md) — endpoint, scopes, tool catalog, and agent flow.
 - [CLI guide](./CLI.md) — install and use the public Node 20+ command-line client.
@@ -20,6 +20,7 @@ Adam connects websites, applications, AI systems, and live experiences to a real
 - [Speech sources](./ai/SPEECH_SOURCES.md)
 - [MCP](./ai/MCP.md)
 - [Claim and activation](./ai/CLAIM_AND_ACTIVATION.md)
+- [Account avatar management](./ai/ACCOUNT_AVATARS.md)
 
 ## MCP and automation
 

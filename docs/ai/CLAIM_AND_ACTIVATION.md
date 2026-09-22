@@ -1,7 +1,7 @@
 # Claim and activation
 
-After provisioning, Adam sends an ownership/sign-in link to the email supplied by the user. The email can be resent within abuse limits if it is lost in the agent conversation.
+During the hosted registration flow, Adam gives the agent a short-lived Google authorization URL. The user follows it and signs in once; no password or manual dashboard setup is required.
 
-The user completes Adam sign-in/OAuth from the link. Claiming attaches the provisional workspace and every avatar/installation in that workspace to the authenticated user. `avatarId` and `installationId` do not change.
+The hosted completion binds the registration to the authenticated Firebase user and provisions the workspace as claimed. For legacy provisional claims, the claim completion path updates the workspace, avatar, installation, and entitlement ownership together. `workspaceId`, `avatarId`, and `installationId` do not change.
 
-The provisional installation uses canned mock speech. Entitlements are recomputed after claim and can later enable live speech without changing the website embed code.
+After sign-in, the avatar appears in the authenticated Adam dashboard. The user can update its identity, personality, voice, and allowed origins without changing the installation embed. Provisional installations use canned mock speech; entitlements are recomputed after claim and can later enable live speech.

@@ -5,7 +5,8 @@ Adam registration is designed for an agent to onboard a user without collecting 
 ## Flow
 
 ```text
-trusted agent
+dynamic or configured agent client
+  → obtain a scoped bearer token
   → POST /v1/registrations
   → receive hosted Google URL
   → user completes Google sign-in
@@ -18,7 +19,7 @@ trusted agent
   → agent polls registration status
 ```
 
-The user does leave the chat momentarily for Google's consent screen, but does not need to create a password, visit an account dashboard, or manually configure an avatar.
+The user leaves the agent conversation momentarily for Google's consent screen, but does not need to create a password or manually configure an avatar. After completion, the avatar is available in the authenticated Adam dashboard for later updates.
 
 ## Registration start
 

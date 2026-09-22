@@ -14,6 +14,7 @@ Adam is an embeddable, remote-controllable real-time talking avatar. It can be c
 - Website or application embed: read `docs/ai/EMBEDDING.md`.
 - Existing application, chatbot, or service control: read `docs/ai/SPEECH_SOURCES.md`.
 - Agent provisioning: read `docs/ai/QUICKSTART.md` and `docs/ai/PROVISIONING.md`.
+- Authenticated avatar management: read `docs/ai/ACCOUNT_AVATARS.md`.
 - MCP discovery and control: read `docs/MCP.md`.
 - Terminal automation: read `docs/CLI.md`.
 - Exact endpoints and schemas: read `docs/openapi/adam-v1.yaml`.
@@ -21,14 +22,15 @@ Adam is an embeddable, remote-controllable real-time talking avatar. It can be c
 ## Standard workflow
 
 1. Clarify the use case: website embed, application control, agent provisioning, or MCP control.
-2. If provisioning is needed, authenticate with an Adam agent client.
-3. List templates and select one with the user.
-4. Ask for the user's email and website origin when applicable.
-5. Provision with a stable idempotency key.
-6. Preserve the returned `avatarId`, `installationId`, and claim identifiers.
-7. Install the returned browser snippet or create a runtime session.
-8. Send speech through browser, REST, WebSocket, or MCP control.
-9. Explain mock mode and claim/activation when the workspace is provisional.
+2. If the agent has no Adam credentials, register a minimally scoped dynamic client at `POST /v1/oauth/register`; keep the one-time secret only in the trusted agent environment.
+3. Obtain a token with `avatars:read`, `registrations:create`, and `registrations:read` for the hosted registration flow.
+4. List templates and select one with the user.
+5. Start hosted Google registration with the website origin and a stable idempotency key.
+6. Ask the user to sign in once, poll registration status, and retrieve the completed embed.
+7. Preserve the returned `workspaceId`, `avatarId`, `installationId`, and registration identifiers.
+8. Install the returned browser snippet or create a runtime session.
+9. Send speech through browser, REST, WebSocket, or MCP control.
+10. Explain mock/live entitlement behavior. After claim, the user can manage the avatar from the authenticated Adam dashboard without changing stable IDs or re-embedding.
 
 ## MCP server
 
@@ -71,14 +73,20 @@ adam doctor
 adam avatar templates --format json
 ```
 
-Credentials belong only in the trusted environment:
+Credentials belong only in the trusted environment. Existing partner agents may use:
 
 ```bash
 export ADAM_AGENT_CLIENT_ID="..."
 export ADAM_AGENT_CLIENT_SECRET="..."
 ```
 
-Use `docs/CLI.md` and `docs/cli/COMMAND_REFERENCE.md` for registration, polling, and embed commands.
+A new agent can bootstrap a minimally scoped client in the current process:
+
+```bash
+adam agent register --name "My app agent" --format json
+```
+
+Never write the returned secret into app source, browser code, `.env` files, logs, or git. Use `docs/CLI.md` and `docs/cli/COMMAND_REFERENCE.md` for registration, polling, and embed commands.
 
 ## Website embed
 

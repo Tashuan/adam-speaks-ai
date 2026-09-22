@@ -58,7 +58,7 @@ Supported transports include browser, REST, WebSocket, and MCP. Each uses the sa
 
 ## MCP server
 
-Adam's MCP endpoint gives agents a direct control surface for template discovery, provisioning, embed generation, session creation, speech, registration, and claim status:
+Adam's MCP endpoint gives scoped agents a direct control surface for template discovery, embed generation, session creation, speech, registration, and claim status. New agents bootstrap through the REST dynamic-client endpoint before connecting to MCP; direct workspace provisioning remains restricted to approved clients:
 
 ```text
 POST https://adam-speaks.com/api/mcp
@@ -83,15 +83,17 @@ Read [`docs/CLI.md`](docs/CLI.md) for installation and [`docs/cli/COMMAND_REFERE
 ## Agent flow
 
 ```text
-authenticate agent
+bootstrap a minimally scoped agent client
+  → obtain a bearer token
   → choose a template
-  → provision with an idempotency key
-  → install the returned embed
+  → start hosted Google registration
+  → user signs in once
+  → poll registration and install the returned embed
   → connect browser, REST, WebSocket, or MCP control
-  → user claims the workspace later
+  → user manages the claimed avatar later
 ```
 
-Provisional workspaces may begin in mock mode. `avatarId` and `installationId` remain stable through claim and activation.
+Provisional workspaces may begin in mock mode. Claiming updates workspace, avatar, installation, and entitlement ownership. `workspaceId`, `avatarId`, and `installationId` remain stable, and later dashboard edits do not require re-embedding.
 
 ## Public contract
 
