@@ -1,0 +1,12 @@
+{
+  "name": "@adam-speaks/cli",
+  "version": "0.1.0",
+  "description": "Command-line tools for Adam avatar provisioning and agent registration.",
+  "type": "module",
+  "bin": {
+    "adam": "src/index.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -11,6 +11,9 @@ This repository contains the public integration contract for developers and AI a
 - Human documentation: [adam-speaks.com/documentation](https://adam-speaks.com/documentation)
 - API reference: [adam-speaks.com/api-reference](https://adam-speaks.com/api-reference)
 - Machine-readable discovery: [`llms.txt`](llms.txt)
+- MCP server guide: [`docs/MCP.md`](docs/MCP.md)
+- CLI guide: [`docs/CLI.md`](docs/CLI.md)
+- Agent skills: [`skills/README.md`](skills/README.md)
 - OpenAPI contract: [`docs/openapi/adam-v1.yaml`](docs/openapi/adam-v1.yaml)
 
 ## Choose a path
@@ -20,8 +23,8 @@ This repository contains the public integration contract for developers and AI a
 | Add an avatar to a website or application | [`docs/ai/EMBEDDING.md`](docs/ai/EMBEDDING.md) |
 | Control an avatar from an application or service | [`docs/ai/SPEECH_SOURCES.md`](docs/ai/SPEECH_SOURCES.md) |
 | Provision an avatar for a user | [`docs/ai/PROVISIONING.md`](docs/ai/PROVISIONING.md) |
-| Let an AI agent discover and control Adam | [`docs/ai/MCP.md`](docs/ai/MCP.md) |
-| Automate onboarding from a terminal | [`docs/cli/README.md`](docs/cli/README.md) |
+| Let an AI agent discover and control Adam | [`docs/MCP.md`](docs/MCP.md) |
+| Automate onboarding from a terminal | [`docs/CLI.md`](docs/CLI.md) |
 | Understand authentication and ownership | [`docs/ai/AUTHENTICATION.md`](docs/ai/AUTHENTICATION.md) |
 
 Start with [`docs/INTEGRATION.md`](docs/INTEGRATION.md) for the shortest decision guide or [`docs/ai/QUICKSTART.md`](docs/ai/QUICKSTART.md) for the complete provisioning flow.
@@ -53,6 +56,30 @@ Adam can receive speech and control events from:
 
 Supported transports include browser, REST, WebSocket, and MCP. Each uses the same server-side speech lifecycle.
 
+## MCP server
+
+Adam's MCP endpoint gives agents a direct control surface for template discovery, provisioning, embed generation, session creation, speech, registration, and claim status:
+
+```text
+POST https://adam-speaks.com/api/mcp
+```
+
+Start with [`docs/MCP.md`](docs/MCP.md) for the endpoint, scopes, tool catalog, request shape, and recommended agent flow.
+
+## CLI
+
+The public CLI source is in [`cli/`](cli/). It requires Node 20 or newer and supports discovery, hosted registration, status polling, and embed generation:
+
+```bash
+cd cli
+npm install
+npm link
+adam doctor
+adam avatar templates --format json
+```
+
+Read [`docs/CLI.md`](docs/CLI.md) for installation and [`docs/cli/COMMAND_REFERENCE.md`](docs/cli/COMMAND_REFERENCE.md) for all commands.
+
 ## Agent flow
 
 ```text
@@ -70,7 +97,9 @@ Provisional workspaces may begin in mock mode. `avatarId` and `installationId` r
 
 - [`docs/ai/`](docs/ai/) — agent, provisioning, embedding, speech, and MCP guides
 - [`docs/api/`](docs/api/) — sessions, events, and errors
+- [`cli/`](cli/) — public Node 20+ CLI source
 - [`docs/cli/`](docs/cli/) — CLI commands and hosted registration
+- [`skills/`](skills/) — canonical and platform-specific agent skills
 - [`docs/openapi/`](docs/openapi/) — machine-readable API definition
 - [`docs/security/`](docs/security/) — authorization, installation keys, and credential isolation
 - [`examples/`](examples/) — minimal integration snippets

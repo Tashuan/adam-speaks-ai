@@ -7,6 +7,9 @@ Adam connects websites, applications, AI systems, and live experiences to a real
 - [Agent integration prompt](./ai/AGENT_PROMPT.md) — the recommended behavior for an agent asked to add Adam.
 - [AI quickstart](./ai/QUICKSTART.md) — authenticate, provision, embed, and speak.
 - [Integration guide](./INTEGRATION.md) — choose the right path for a website, existing AI, or agent.
+- [MCP server guide](./MCP.md) — endpoint, scopes, tool catalog, and agent flow.
+- [CLI guide](./CLI.md) — install and use the public Node 20+ command-line client.
+- [Agent skills](../skills/README.md) — canonical and platform-specific skills for agents.
 - [OpenAPI contract](./openapi/adam-v1.yaml) — canonical machine-readable API definition.
 
 ## Avatar and application integration
@@ -18,9 +21,10 @@ Adam connects websites, applications, AI systems, and live experiences to a real
 - [MCP](./ai/MCP.md)
 - [Claim and activation](./ai/CLAIM_AND_ACTIVATION.md)
 
-## Automation
+## MCP and automation
 
-- [CLI overview](./cli/README.md)
+- [MCP server](./MCP.md)
+- [CLI overview](./CLI.md)
 - [CLI command reference](./cli/COMMAND_REFERENCE.md)
 - [Hosted registration flow](./cli/REGISTRATION_FLOW.md)
 
