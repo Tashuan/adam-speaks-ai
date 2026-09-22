@@ -50,4 +50,14 @@ Use `--api-url` for an alternate API endpoint and `--format json` for agents and
 
 The CLI does not deploy, revoke, delete, or rotate production resources implicitly.
 
+## Agent-first bootstrap
+
+If `ADAM_AGENT_TOKEN` is unavailable and static `ADAM_AGENT_CLIENT_ID` / `ADAM_AGENT_CLIENT_SECRET` credentials are not configured, the CLI can register a minimally scoped dynamic agent client in memory for the current process:
+
+```bash
+adam agent register --name "My app's AI agent" --format json
+```
+
+The returned client secret is trusted-agent credential material. Do not write it into the application, browser bundle, `.env` file, or git repository. Set `ADAM_AGENT_IDEMPOTENCY_KEY` when a host needs retries to resolve to the same dynamic client.
+
 See the [full command reference](./cli/COMMAND_REFERENCE.md) and [registration flow](./cli/REGISTRATION_FLOW.md).

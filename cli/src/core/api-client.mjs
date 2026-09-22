@@ -13,6 +13,18 @@ export class AdamApiClient {
     this.clientId = clientId || process.env.ADAM_AGENT_CLIENT_ID;
     this.clientSecret = clientSecret || process.env.ADAM_AGENT_CLIENT_SECRET;
     this.token = token || process.env.ADAM_AGENT_TOKEN || null;
+    this.dynamicIdempotencyKey = process.env.ADAM_AGENT_IDEMPOTENCY_KEY || `adam-cli-${process.pid}-${Date.now()}`;
+  }
+
+  async registerDynamicClient(clientName = process.env.ADAM_AGENT_CLIENT_NAME || 'Adam CLI agent') {
+    const payload = await this.request('/v1/oauth/register', {
+      method: 'POST',
+      body: JSON.stringify({ client_name: clientName, idempotency_key: this.dynamicIdempotencyKey }),
+      headers: { Authorization: undefined }
+    });
+    this.clientId = payload.client_id;
+    this.clientSecret = payload.client_secret;
+    return payload;
   }
 
   async request(path, options = {}) {
@@ -24,8 +36,8 @@ export class AdamApiClient {
     return payload;
   }
 
-  async authenticate(scopes = ['avatars:read', 'registrations:create', 'registrations:read', 'workspaces:provision']) {
-    if (!this.clientId || !this.clientSecret) throw new Error('Set ADAM_AGENT_CLIENT_ID and ADAM_AGENT_CLIENT_SECRET before using this command.');
+  async authenticate(scopes = ['avatars:read', 'registrations:create', 'registrations:read']) {
+    if (!this.clientId || !this.clientSecret) await this.registerDynamicClient();
     const payload = await this.request('/v1/oauth/token', {
       method: 'POST',
       body: JSON.stringify({ grant_type: 'client_credentials', client_id: this.clientId, client_secret: this.clientSecret, scope: scopes.join(' ') }),

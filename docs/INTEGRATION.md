@@ -29,13 +29,13 @@ The source can be an AI assistant, backend service, support workflow, product UI
 The agent should:
 
 1. Determine whether the user wants a website embed, application control, or agent-managed avatar.
-2. Authenticate with Adam agent credentials when provisioning is required.
-3. List templates and choose one with the user.
-4. Ask for the user's email and website origin when applicable.
-5. Provision with a stable idempotency key.
-6. Return the installation snippet and preserve the returned IDs.
-7. Explain that the initial workspace may use mock speech.
-8. Let the user claim the workspace later.
+2. If it has no Adam credentials, register a minimally scoped dynamic agent client and keep the returned secret in the trusted agent environment only.
+3. Obtain a bearer token with `avatars:read`, `registrations:create`, and `registrations:read`.
+4. List templates and choose one with the user.
+5. Start hosted Google registration with the user's website origin and a stable idempotency key.
+6. Ask the user to sign in once, then poll registration status.
+7. Return the installation snippet and preserve the stable avatar and installation IDs.
+8. Explain mock/live entitlement behavior and that the user can manage the claimed avatar later without re-embedding it.
 
 Read [AI quickstart](./ai/QUICKSTART.md), [Provisioning](./ai/PROVISIONING.md), and [Claim and activation](./ai/CLAIM_AND_ACTIVATION.md).
 

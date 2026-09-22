@@ -12,7 +12,7 @@ function output(value, options) {
 }
 
 function help() {
-  console.log(`Adam CLI\n\nUsage:\n  adam <command> [options]\n\nCommands:\n  doctor                         Check API and local configuration\n  avatar templates               List available avatar templates\n  registration start             Start hosted Google registration\n  registration status <id>       Read registration status\n  registration wait <id>         Wait for registration completion\n  registration embed <id>        Get the completed registration embed\n  embed generate                 Generate an installation embed\n\nCommon options:\n  --api-url <url>                Override the API base URL\n  --format json                  Return machine-readable JSON\n\nAgent credentials:\n  ADAM_AGENT_CLIENT_ID\n  ADAM_AGENT_CLIENT_SECRET\n`);
+  console.log(`Adam CLI\n\nUsage:\n  adam <command> [options]\n\nCommands:\n  doctor                         Check API and local configuration\n  avatar templates               List available avatar templates\n  agent register                 Register a temporary agent client\n  registration start             Start hosted Google registration\n  registration status <id>       Read registration status\n  registration wait <id>         Wait for registration completion\n  registration embed <id>        Get the completed registration embed\n  embed generate                 Generate an installation embed\n\nCommon options:\n  --api-url <url>                Override the API base URL\n  --format json                  Return machine-readable JSON\n\nAgent credentials:\n  ADAM_AGENT_CLIENT_ID\n  ADAM_AGENT_CLIENT_SECRET\n`);
 }
 
 function client(options) {
@@ -26,7 +26,7 @@ async function run(argv) {
 
   if (command === 'doctor') {
     const api = client(options);
-    const result = { apiUrl: api.baseUrl, node: process.version, credentialsConfigured: Boolean(api.clientId && api.clientSecret) };
+    const result = { apiUrl: api.baseUrl, node: process.version, credentialsConfigured: Boolean(api.clientId && api.clientSecret), dynamicBootstrapAvailable: true };
     try {
       await api.request('/v1/avatar-templates');
       result.api = 'reachable';
@@ -35,6 +35,11 @@ async function run(argv) {
       result.error = error.message;
     }
     return output(result, options);
+  }
+
+  if (command === 'agent' && subcommand === 'register') {
+    const api = client(options);
+    return output(await api.registerDynamicClient(options.name), options);
   }
 
   if (command === 'avatar' && subcommand === 'templates') {

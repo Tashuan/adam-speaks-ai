@@ -35,7 +35,7 @@ The MCP endpoint is https://adam-speaks.com/api/mcp. It exposes template discove
 The public Node 20+ CLI is in cli/. Read docs/CLI.md for installation and docs/cli/COMMAND_REFERENCE.md for commands including doctor, avatar templates, registration, and embed generation.
 
 ## Agent guidance
-When asked to add Adam, determine whether the user needs a website embed, application control, or agent provisioning. For agent provisioning, authenticate, collect the user's email and website origin, choose a template, provision with a stable idempotency key, install the returned embed, and connect browser, REST, WebSocket, or MCP speech.
+When asked to add Adam, determine whether the user needs a website embed, application control, or agent provisioning. If the agent has no Adam credentials, bootstrap a minimally scoped dynamic client through `POST /v1/oauth/register` and keep its one-time secret in the trusted agent environment. Then choose a template, start hosted Google registration with a stable idempotency key, ask the user to sign in once, poll completion, install the returned embed, and connect browser, REST, WebSocket, or MCP speech. The user can manage the claimed avatar later without re-embedding it.
 
 ## Security
 Provider credentials and agent secrets remain server-side. Installation keys are scoped browser capabilities. Runtime tokens are short-lived and scoped to one installation, avatar, and session.

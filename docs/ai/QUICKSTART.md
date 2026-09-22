@@ -5,38 +5,37 @@ Adam lets an authenticated agent provision a provisional avatar before the user 
 ## Flow
 
 ```text
-agent client credentials
+dynamic agent client
+  → obtain minimal bearer token
   → list avatar templates
-  → collect user email
-  → provision workspace
-  → add generated embed
+  → start hosted Google registration
+  → user signs in once
+  → poll registration and add generated embed
   → send text to the speech endpoint
-  → mock response now
-  → user claims/configures later
+  → user manages the claimed avatar later
 ```
 
-## 1. Get an agent token
+## 1. Bootstrap an agent client
 
-Use the client-credentials endpoint with an Adam-issued client ID and secret:
+If the agent does not already have Adam credentials, register a minimally scoped client. Keep the returned secret in the trusted agent environment only; never put it in the app or browser bundle.
 
 ```bash
-curl -X POST https://adam-speaks.com/api/v1/oauth/token \
+curl -X POST https://adam-speaks.com/api/v1/oauth/register \
   -H 'Content-Type: application/json' \
-  -d '{"grant_type":"client_credentials","client_id":"...","client_secret":"...","scope":"workspaces:provision"}'
+  -d '{"client_name":"My app agent","idempotency_key":"my-app-adam-setup-001"}'
 ```
 
-## 2. Provision
+Use the returned client credentials to obtain a token with `avatars:read registrations:create registrations:read`.
 
-```bash
-curl -X POST https://adam-speaks.com/api/v1/provisioning/workspaces \
-  -H "Authorization: Bearer AGENT_TOKEN" \
-  -H 'Content-Type: application/json' \
-  -d '{"email":"user@example.com","templateId":"template_friendly_01","origin":"https://example.com","projectName":"My site","idempotencyKey":"project-install-001"}'
-```
+## 2. Start hosted registration
 
-The response contains `avatarId`, `installationId`, `embedKey`, mock status, claim instructions, and speech-source instructions.
+The agent should list templates, ask the user to choose one, and call `POST /v1/registrations` with the user's website origin and stable idempotency key. Show the returned `authorizationUrl` to the user and poll the registration status after Google sign-in.
 
-## 3. Embed
+## 3. Retrieve the completed embed
+
+After the user completes Google sign-in, poll `GET /v1/registrations/{registrationId}` until `status` is `completed`. The response contains the stable avatar and installation IDs plus the generated embed payload. The agent can then add the embed to the user's app.
+
+## 4. Embed
 
 ```html
 <script src="https://adam-speaks.com/assets/avatar-widget/ai-first-embed.js"
@@ -44,7 +43,7 @@ The response contains `avatarId`, `installationId`, `embedKey`, mock status, cla
   data-embed-key="ek_..."></script>
 ```
 
-## 4. Speak
+## 5. Speak
 
 The provisional avatar accepts speech immediately but uses a canned mock response. Live speech becomes available after the workspace is claimed and its entitlements permit it.
 

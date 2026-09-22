@@ -6,6 +6,31 @@ info:
 servers:
   - url: https://adam-speaks.com/api
 paths:
+  /v1/oauth/register:
+    post:
+      summary: Register a minimally scoped dynamic agent client
+      description: Returns a client secret once. The client can discover templates and start hosted user registration, but cannot provision workspaces directly.
+      parameters:
+        - $ref: '#/components/parameters/RequestId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DynamicAgentClientRequest'
+      responses:
+        '200':
+          description: Dynamic agent credentials. The client secret is returned only at registration time.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DynamicAgentClientResponse'
+        '400':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '503':
+          $ref: '#/components/responses/Error'
   /v1/oauth/token:
     post:
       summary: Issue an agent client-credentials token
@@ -215,6 +240,23 @@ components:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
   schemas:
+    DynamicAgentClientRequest:
+      type: object
+      required: [client_name, idempotency_key]
+      properties:
+        client_name: { type: string, maxLength: 120 }
+        idempotency_key: { type: string, minLength: 1, maxLength: 200 }
+    DynamicAgentClientResponse:
+      type: object
+      required: [client_id, client_secret, token_endpoint, scopes]
+      properties:
+        client_id: { type: string }
+        client_secret: { type: string, format: password }
+        client_name: { type: string }
+        client_type: { type: string, enum: [dynamic] }
+        token_endpoint: { type: string }
+        scopes: { type: array, items: { type: string } }
+        secret_handling: { type: string }
     ClientCredentialsRequest:
       type: object
       required: [grant_type, client_id, client_secret]
