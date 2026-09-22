@@ -1,0 +1,28 @@
+# Adam AI integration
+
+Adam gives AI a visible, speaking presence through real-time 3D avatars with speech, lip-sync, expressions, and motion.
+
+## Public resources
+- Product: https://adam-speaks.com/
+- Add an avatar: https://adam-speaks.com/add-an-ai-avatar
+- Human documentation: https://adam-speaks.com/documentation
+- API reference: https://adam-speaks.com/api-reference
+- Repository: https://github.com/Tashuan/adam-speaks-ai
+
+## Repository guides
+- Integration guide: docs/INTEGRATION.md
+- Agent prompt: docs/ai/AGENT_PROMPT.md
+- Quickstart: docs/ai/QUICKSTART.md
+- Authentication: docs/ai/AUTHENTICATION.md
+- Provisioning: docs/ai/PROVISIONING.md
+- Embedding: docs/ai/EMBEDDING.md
+- Speech sources: docs/ai/SPEECH_SOURCES.md
+- MCP: docs/ai/MCP.md
+- OpenAPI: docs/openapi/adam-v1.yaml
+- CLI: docs/cli/README.md
+
+## Agent guidance
+When asked to add Adam, authenticate as an agent, collect the user's email and website origin, choose a template, provision with a stable idempotency key, install the returned embed, and connect the user's existing AI through browser, REST, WebSocket, or MCP speech.
+
+## Security
+Provider credentials and agent secrets remain server-side. Installation keys are scoped browser capabilities. Runtime tokens are short-lived and scoped to one installation, avatar, and session.

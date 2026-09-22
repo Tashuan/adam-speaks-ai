@@ -1,0 +1,339 @@
+openapi: 3.0.3
+info:
+  title: Adam AI-First Avatar API
+  version: 1.0.0
+  description: Agent-first provisioning, installation sessions, and speech control.
+servers:
+  - url: https://adam-speaks.com/api
+paths:
+  /v1/oauth/token:
+    post:
+      summary: Issue an agent client-credentials token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClientCredentialsRequest'
+      responses:
+        '200':
+          description: Access token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+  /v1/oauth/authorize:
+    get:
+      summary: Create a delegated authorization-code with PKCE
+      security:
+        - bearerAuth: []
+      parameters:
+        - { name: client_id, in: query, required: true, schema: { type: string } }
+        - { name: redirect_uri, in: query, required: true, schema: { type: string, format: uri } }
+        - { name: scope, in: query, schema: { type: string } }
+        - { name: code_challenge, in: query, required: true, schema: { type: string } }
+        - { name: code_challenge_method, in: query, required: true, schema: { type: string, enum: [S256] } }
+      responses:
+        '200':
+          description: One-time authorization code and registered redirect URI
+  /v1/avatar-templates:
+    get:
+      summary: List active avatar templates
+      responses:
+        '200':
+          description: Templates
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [templates]
+                properties:
+                  templates:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AvatarTemplate'
+  /v1/registrations:
+    post:
+      summary: Start a hosted Google registration intent
+      security:
+        - bearerAuth: [registrations:create]
+      parameters:
+        - $ref: '#/components/parameters/RequestId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegistrationRequest'
+      responses:
+        '200':
+          description: Registration intent and hosted Google URL
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegistrationResponse'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+  /v1/registrations/{registrationId}:
+    get:
+      summary: Read registration status
+      security:
+        - bearerAuth: [registrations:read]
+      parameters:
+        - $ref: '#/components/parameters/RegistrationId'
+      responses:
+        '200':
+          description: Registration status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegistrationResponse'
+        '404':
+          $ref: '#/components/responses/Error'
+  /v1/registrations/{registrationId}/complete:
+    post:
+      summary: Complete registration from the hosted Google page
+      parameters:
+        - $ref: '#/components/parameters/RegistrationId'
+      security: []
+      responses:
+        '200':
+          description: Completed registration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegistrationResponse'
+        '401':
+          $ref: '#/components/responses/Error'
+        '410':
+          $ref: '#/components/responses/Error'
+  /v1/provisioning/workspaces:
+    post:
+      summary: Provision a provisional workspace and avatar
+      security:
+        - bearerAuth: [workspaces:provision]
+      parameters:
+        - $ref: '#/components/parameters/RequestId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProvisionWorkspaceRequest'
+      responses:
+        '200':
+          description: Provisioned installation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProvisionWorkspaceResponse'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+  /v1/installations/{installationId}/sessions:
+    post:
+      summary: Create a short-lived runtime session
+      parameters:
+        - $ref: '#/components/parameters/InstallationId'
+        - $ref: '#/components/parameters/Origin'
+        - $ref: '#/components/parameters/InstallationKey'
+      responses:
+        '200':
+          description: Runtime session
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RuntimeSessionResponse'
+        '403':
+          $ref: '#/components/responses/Error'
+  /v1/installations/{installationId}/speech:
+    post:
+      summary: Submit speech through an installation
+      parameters:
+        - $ref: '#/components/parameters/InstallationId'
+        - $ref: '#/components/parameters/Origin'
+        - $ref: '#/components/parameters/InstallationKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SpeechRequest'
+      responses:
+        '200':
+          description: Accepted speech
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpeechResponse'
+        '403':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  parameters:
+    RequestId:
+      name: X-Request-ID
+      in: header
+      schema: { type: string }
+    InstallationId:
+      name: installationId
+      in: path
+      required: true
+      schema: { type: string }
+    RegistrationId:
+      name: registrationId
+      in: path
+      required: true
+      schema: { type: string }
+    InstallationKey:
+      name: X-Installation-Key
+      in: header
+      required: true
+      schema: { type: string }
+    Origin:
+      name: Origin
+      in: header
+      required: true
+      schema: { type: string, format: uri }
+  responses:
+    Error:
+      description: Machine-readable error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+  schemas:
+    ClientCredentialsRequest:
+      type: object
+      required: [grant_type, client_id, client_secret]
+      properties:
+        grant_type: { type: string, enum: [client_credentials] }
+        client_id: { type: string }
+        client_secret: { type: string, format: password }
+        scope: { type: string }
+    TokenResponse:
+      type: object
+      required: [access_token, token_type, expires_in]
+      properties:
+        access_token: { type: string }
+        token_type: { type: string, enum: [Bearer] }
+        expires_in: { type: integer }
+        scope: { type: string }
+    RegistrationRequest:
+      type: object
+      required: [displayName, templateId, origin, idempotencyKey, consent]
+      properties:
+        displayName: { type: string, maxLength: 120 }
+        projectName: { type: string, maxLength: 160 }
+        templateId: { type: string }
+        origin: { type: string, format: uri }
+        idempotencyKey: { type: string, minLength: 8 }
+        consent:
+          type: object
+          required: [termsAccepted, privacyAccepted]
+          properties:
+            termsAccepted: { type: boolean, const: true }
+            privacyAccepted: { type: boolean, const: true }
+    RegistrationResponse:
+      type: object
+      required: [registrationId, status, expiresAt]
+      properties:
+        registrationId: { type: string }
+        status: { type: string, enum: [google_authorization_required, completed, expired, cancelled] }
+        authorizationUrl: { type: string, format: uri }
+        expiresAt: { type: integer }
+        completedAt: { type: integer }
+        workspaceId: { type: string }
+        avatarId: { type: string }
+        installationId: { type: string }
+        embed: { type: object, additionalProperties: true }
+        speech: { type: object, additionalProperties: true }
+    AvatarTemplate:
+      type: object
+      required: [templateId, name, runtimePresetId, capabilities, status]
+      properties:
+        templateId: { type: string }
+        name: { type: string }
+        description: { type: string }
+        previewUrl: { type: string, format: uri }
+        runtimePresetId: { type: string }
+        defaultVoiceId: { type: string }
+        capabilities:
+          type: array
+          items: { type: string }
+        status: { type: string, enum: [active, hidden, retired] }
+        currentVersion: { type: integer }
+    ProvisionWorkspaceRequest:
+      type: object
+      required: [email, templateId, origin, idempotencyKey]
+      properties:
+        email: { type: string, format: email }
+        templateId: { type: string }
+        origin: { type: string, format: uri }
+        projectName: { type: string }
+        source: { type: string }
+        idempotencyKey: { type: string, minLength: 8 }
+    ProvisionWorkspaceResponse:
+      type: object
+      required: [workspaceId, avatarId, installationId, embedKey, speechMode]
+      properties:
+        workspaceId: { type: string }
+        avatarId: { type: string }
+        installationId: { type: string }
+        embedKey: { type: string }
+        status: { type: string }
+        speechMode: { type: string, enum: [mock, live] }
+        embed: { type: object, additionalProperties: true }
+        speech: { type: object, additionalProperties: true }
+        claim: { type: object, additionalProperties: true }
+    RuntimeSessionResponse:
+      type: object
+      required: [sessionId, runtimeToken, expiresAt]
+      properties:
+        sessionId: { type: string }
+        runtimeToken: { type: string }
+        expiresAt: { type: integer }
+    SpeechRequest:
+      type: object
+      required: [text]
+      properties:
+        text: { type: string, minLength: 1, maxLength: 5000 }
+        idempotencyKey: { type: string }
+        animationPolicy: { type: string }
+        voiceId: { type: string, nullable: true }
+        expression: { type: string, nullable: true }
+        priority: { type: string }
+    SpeechResponse:
+      type: object
+      required: [speechId, mode, status]
+      properties:
+        speechId: { type: string }
+        mode: { type: string, enum: [mock, live] }
+        status: { type: string }
+        displayText: { type: string }
+        events: { type: array, items: { type: object, additionalProperties: true } }
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message, retryable, requestId]
+          properties:
+            code: { type: string }
+            message: { type: string }
+            retryable: { type: boolean }
+            requestId: { type: string }
+            details: { type: object, additionalProperties: true }
