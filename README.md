@@ -1,6 +1,8 @@
-# Adam AI integration
+# Adam real-time avatar integration
 
-Adam gives AI a visible, speaking presence through real-time 3D avatars with speech, lip-sync, expressions, and motion.
+Adam is an embeddable, remote-controllable real-time talking avatar for websites, applications, products, and interactive experiences.
+
+Connect it to an AI system, application, service, game, kiosk, support flow, educational experience, event, or live control surface. Adam turns commands and text into speech, lip-sync, expressions, and motion without requiring one specific model or framework.
 
 This repository contains the public integration contract for developers and AI agents. It does not contain the private Adam application, admin console, Firebase infrastructure, or runtime source.
 
@@ -15,16 +17,16 @@ This repository contains the public integration contract for developers and AI a
 
 | You want to… | Read |
 | --- | --- |
-| Add an avatar to a website | [`docs/ai/EMBEDDING.md`](docs/ai/EMBEDDING.md) |
+| Add an avatar to a website or application | [`docs/ai/EMBEDDING.md`](docs/ai/EMBEDDING.md) |
+| Control an avatar from an application or service | [`docs/ai/SPEECH_SOURCES.md`](docs/ai/SPEECH_SOURCES.md) |
 | Provision an avatar for a user | [`docs/ai/PROVISIONING.md`](docs/ai/PROVISIONING.md) |
-| Connect an existing AI or chatbot | [`docs/ai/SPEECH_SOURCES.md`](docs/ai/SPEECH_SOURCES.md) |
 | Let an AI agent discover and control Adam | [`docs/ai/MCP.md`](docs/ai/MCP.md) |
 | Automate onboarding from a terminal | [`docs/cli/README.md`](docs/cli/README.md) |
 | Understand authentication and ownership | [`docs/ai/AUTHENTICATION.md`](docs/ai/AUTHENTICATION.md) |
 
 Start with [`docs/INTEGRATION.md`](docs/INTEGRATION.md) for the shortest decision guide or [`docs/ai/QUICKSTART.md`](docs/ai/QUICKSTART.md) for the complete provisioning flow.
 
-## Website embed
+## Website and application embed
 
 A trusted backend or agent provisions an installation and returns an installation ID and browser-visible embed key:
 
@@ -38,6 +40,19 @@ A trusted backend or agent provisions an installation and returns an installatio
 
 The browser exchanges the key for a short-lived runtime session. Never put provider keys, agent secrets, Firebase credentials, owner IDs, or account credentials in browser code.
 
+## Remote control
+
+Adam can receive speech and control events from:
+
+- An AI assistant or model
+- A web application
+- A backend service
+- A support or education workflow
+- A game, kiosk, event, or interactive installation
+- An AI agent using MCP
+
+Supported transports include browser, REST, WebSocket, and MCP. Each uses the same server-side speech lifecycle.
+
 ## Agent flow
 
 ```text
@@ -45,7 +60,7 @@ authenticate agent
   → choose a template
   → provision with an idempotency key
   → install the returned embed
-  → connect browser, REST, WebSocket, or MCP speech
+  → connect browser, REST, WebSocket, or MCP control
   → user claims the workspace later
 ```
 

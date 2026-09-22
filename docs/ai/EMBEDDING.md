@@ -1,6 +1,6 @@
 # Embedding
 
-The AI-first embed uses an installation ID and installation key:
+The Adam embed uses an installation ID and installation key. It can be controlled by an AI system, application, backend service, or live experience:
 
 ```html
 <script src="https://adam-speaks.com/assets/avatar-widget/ai-first-embed.js"

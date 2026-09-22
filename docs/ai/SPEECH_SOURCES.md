@@ -1,6 +1,6 @@
 # Speech Sources
 
-Browser, REST, WebSocket, and MCP speech requests use the same server-side SpeechOrchestrator and lifecycle.
+Browser, REST, WebSocket, and MCP speech requests use the same server-side SpeechOrchestrator and lifecycle. The controller can be an AI system, application, backend service, live operator, or agent.
 
 ## Browser
 

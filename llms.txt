@@ -1,6 +1,6 @@
-# Adam AI integration
+# Adam real-time avatar integration
 
-Adam gives AI a visible, speaking presence through real-time 3D avatars with speech, lip-sync, expressions, and motion.
+Adam is an embeddable, remote-controllable real-time talking avatar for websites, applications, products, and interactive experiences.
 
 ## Public resources
 - Product: https://adam-speaks.com/
@@ -21,8 +21,11 @@ Adam gives AI a visible, speaking presence through real-time 3D avatars with spe
 - OpenAPI: docs/openapi/adam-v1.yaml
 - CLI: docs/cli/README.md
 
+## Use cases
+Adam can be embedded in a website, product, support flow, educational experience, kiosk, event, game, interactive installation, or branded conversation. It can be remotely controlled by an AI system, application, backend service, live operator, or agent.
+
 ## Agent guidance
-When asked to add Adam, authenticate as an agent, collect the user's email and website origin, choose a template, provision with a stable idempotency key, install the returned embed, and connect the user's existing AI through browser, REST, WebSocket, or MCP speech.
+When asked to add Adam, determine whether the user needs a website embed, application control, or agent provisioning. For agent provisioning, authenticate, collect the user's email and website origin, choose a template, provision with a stable idempotency key, install the returned embed, and connect browser, REST, WebSocket, or MCP speech.
 
 ## Security
 Provider credentials and agent secrets remain server-side. Installation keys are scoped browser capabilities. Runtime tokens are short-lived and scoped to one installation, avatar, and session.

@@ -1,6 +1,6 @@
 # Adam integration documentation
 
-Adam connects an AI system to a real-time 3D avatar. The public contract is organized around a stable avatar, a scoped installation, and short-lived runtime sessions.
+Adam connects websites, applications, AI systems, and live experiences to a real-time talking avatar. The public contract is organized around a stable avatar, a scoped installation, and short-lived runtime sessions.
 
 ## Start here
 
@@ -9,7 +9,7 @@ Adam connects an AI system to a real-time 3D avatar. The public contract is orga
 - [Integration guide](./INTEGRATION.md) — choose the right path for a website, existing AI, or agent.
 - [OpenAPI contract](./openapi/adam-v1.yaml) — canonical machine-readable API definition.
 
-## AI and website integration
+## Avatar and application integration
 
 - [Authentication](./ai/AUTHENTICATION.md)
 - [Provisioning](./ai/PROVISIONING.md)
