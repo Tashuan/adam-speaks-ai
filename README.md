@@ -84,7 +84,3 @@ Provisional workspaces may begin in mock mode. `avatarId` and `installationId` r
 - Provider credentials never enter the embed or runtime configuration.
 
 See [`docs/security/INSTALLATION_KEYS.md`](docs/security/INSTALLATION_KEYS.md), [`docs/security/AUTHORIZATION.md`](docs/security/AUTHORIZATION.md), and [`docs/security/BYOK_ISOLATION.md`](docs/security/BYOK_ISOLATION.md).
-
-## Repository scope
-
-This is a documentation and integration contract repository. Application source, private infrastructure, deployment configuration, secrets, and the signed-in admin experience remain in the private `adam-speaks` repository.
