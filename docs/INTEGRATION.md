@@ -32,10 +32,10 @@ The agent should:
 2. If it has no Adam credentials, register a minimally scoped dynamic agent client and keep the returned secret in the trusted agent environment only.
 3. Obtain a bearer token with `avatars:read`, `registrations:create`, and `registrations:read`.
 4. List templates and choose one with the user.
-5. Start hosted Google registration with the user's website origin and a stable idempotency key.
-6. Ask the user to sign in once, then poll registration status.
-7. Return the installation snippet and preserve the stable avatar and installation IDs.
-8. Explain mock/live entitlement behavior and that the user can manage the claimed avatar later without re-embedding it.
+5. Start an origin-bound preview registration with the user's website origin and a stable idempotency key.
+6. Install the returned preview snippet and show the private one-time `claimUrl` only in trusted chat or terminal.
+7. Ask the user to sign in once, then poll registration status and preserve stable avatar and installation IDs.
+8. Explain bounded preview/mock behavior, trial expiry, inactive public state, and dashboard reactivation without re-embedding.
 
 Read [AI quickstart](./ai/QUICKSTART.md), [Provisioning](./ai/PROVISIONING.md), and [Claim and activation](./ai/CLAIM_AND_ACTIVATION.md).
 
@@ -70,6 +70,7 @@ An AI agent is one controller type; browser code, backend services, applications
 - Validate the website origin during provisioning and session creation.
 - Use idempotency keys for retries.
 - Treat embed keys as revocable browser capabilities.
-- Do not log raw credentials or user tokens.
+- Treat claim URLs as one-time private handoff credentials; never put them in browser code or public page content.
+- Do not log raw credentials, claim tokens, or user tokens.
 
 See [Authorization](./security/AUTHORIZATION.md), [Installation keys](./security/INSTALLATION_KEYS.md), and [BYOK isolation](./security/BYOK_ISOLATION.md).

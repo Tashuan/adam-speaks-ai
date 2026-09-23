@@ -25,12 +25,12 @@ Adam is an embeddable, remote-controllable real-time talking avatar. It can be c
 2. If the agent has no Adam credentials, register a minimally scoped dynamic client at `POST /v1/oauth/register`; keep the one-time secret only in the trusted agent environment.
 3. Obtain a token with `avatars:read`, `registrations:create`, and `registrations:read` for the hosted registration flow.
 4. List templates and select one with the user.
-5. Start hosted Google registration with the website origin and a stable idempotency key.
-6. Ask the user to sign in once, poll registration status, and retrieve the completed embed.
-7. Preserve the returned `workspaceId`, `avatarId`, `installationId`, and registration identifiers.
-8. Install the returned browser snippet or create a runtime session.
-9. Send speech through browser, REST, WebSocket, or MCP control.
-10. Explain mock/live entitlement behavior. After claim, the user can manage the avatar from the authenticated Adam dashboard without changing stable IDs or re-embedding.
+5. Start an origin-bound preview registration with a stable idempotency key.
+6. Install the returned preview embed, then show the private one-time `claimUrl` only in trusted chat or terminal. Never put it in browser code, public page text, logs, or git.
+7. Poll registration status after Google sign-in and preserve the returned `workspaceId`, `avatarId`, `installationId`, and registration identifiers.
+8. Explain that preview behavior is bounded and mock/canned; after claim, avatar rendering and speech follow trial/subscription entitlements.
+9. If a trial ends, explain that the public widget becomes inactive without a billing CTA and that the owner reactivates from the Adam account dashboard without re-embedding.
+10. Send speech through browser, REST, WebSocket, or MCP control.
 
 ## MCP server
 
@@ -90,7 +90,7 @@ Never write the returned secret into app source, browser code, `.env` files, log
 
 ## Website embed
 
-Use installation details returned by a trusted backend or agent:
+Use installation details returned by a trusted backend or agent. The same snippet can render the bounded preview before claim and the owned installation after claim:
 
 ```html
 <script
@@ -100,19 +100,23 @@ Use installation details returned by a trusted backend or agent:
 </script>
 ```
 
+The private `claimUrl` is not part of the snippet. Show it only in the trusted agent/user channel.
+
 ## Security rules
 
 - Never put agent client secrets or provider keys in browser code.
 - Treat installation keys as scoped, revocable browser capabilities.
+- Treat claim URLs as one-time private handoff credentials; never put them in webpages or logs.
 - Runtime tokens are short-lived and scoped to one installation, avatar, and session.
+- Enforce exact website origins; origin checks do not replace token scoping.
 - Use stable idempotency keys for retries.
-- Do not log raw credentials, installation keys, or user tokens.
+- Do not log raw credentials, installation keys, claim tokens, or user tokens.
 - Do not invent undocumented endpoints, tools, scopes, or resource fields.
 
 ## Failure handling
 
 - If the user has not chosen a template, list templates before provisioning.
 - If provisioning is retried, reuse the same idempotency key.
-- If a provisional avatar speaks in mock mode, explain that claim and entitlement activation enable live behavior.
+- If a preview avatar speaks in mock mode, explain that the private claim handoff, trial, and subscription entitlements control production behavior.
 - If the user needs runtime speech from an application, use browser, REST, or WebSocket documentation rather than MCP-only guidance.
 - If a request requires an unsupported capability, say so and point to the closest documented transport.

@@ -1,6 +1,6 @@
 # Adam CLI
 
-The Adam CLI is a Node 20+ command-line client for avatar discovery, hosted registration, provisioning workflows, status polling, and embed generation.
+The Adam CLI is a Node 20+ command-line client for avatar discovery, origin-bound preview registration, private claim handoff, status polling, and embed generation.
 
 ## Install from this repository
 

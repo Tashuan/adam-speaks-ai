@@ -1,6 +1,6 @@
-# Hosted Google registration flow
+# Preview registration and private claim flow
 
-Adam registration is designed for an agent to onboard a user without collecting a password or asking the user to navigate through the Adam dashboard.
+Adam gives an agent an immediate origin-bound preview while keeping ownership transfer private and user-controlled.
 
 ## Flow
 
@@ -8,57 +8,30 @@ Adam registration is designed for an agent to onboard a user without collecting 
 dynamic or configured agent client
   → obtain a scoped bearer token
   → POST /v1/registrations
-  → receive hosted Google URL
+  → receive preview embed + private one-time claimUrl
+  → agent installs only the preview embed
+  → agent shows claimUrl in trusted chat/terminal
   → user completes Google sign-in
-  → hosted page obtains a Firebase ID token
-  → POST /v1/registrations/{id}/complete
-  → backend verifies the Firebase token
-  → registration is linked to the Firebase UID
-  → workspace, avatar, and installation are provisioned
-  → embed snippet is attached to the completed registration
+  → hosted page sends Firebase ID token + claim token
+  → backend verifies both and attaches the existing preview installation
   → agent polls registration status
 ```
 
-The user leaves the agent conversation momentarily for Google's consent screen, but does not need to create a password or manually configure an avatar. After completion, the avatar is available in the authenticated Adam dashboard for later updates.
+The user leaves the agent conversation momentarily for the private Adam page, but does not need to manually configure an embed. The preview can render before claim. After completion, the avatar is available in the authenticated Adam dashboard.
 
 ## Registration start
 
-The agent requires the `registrations:create` scope:
-
-```http
-POST /api/v1/registrations
-Authorization: Bearer AGENT_TOKEN
-Content-Type: application/json
-```
-
-```json
-{
-  "displayName": "Taylor",
-  "projectName": "Taylor's site",
-  "origin": "https://example.com",
-  "templateId": "template_friendly_01",
-  "idempotencyKey": "site-registration-001"
-}
-```
-
-The response includes a short-lived `authorizationUrl` and `registrationId`.
+The agent requires the `registrations:create` scope. The request includes the website origin, template, consent, and stable idempotency key. The response includes the normal preview embed and a private one-time `claimUrl`. Add only the embed to the app. Show `claimUrl` directly to the user; never put it in HTML, public page text, source code, logs, or git.
 
 ## Hosted completion
 
-The hosted Angular route is:
+The hosted route is:
 
 ```text
-/auth/agent/google?registrationId=reg_...
+/auth/agent/google?registrationId=reg_...#claim=claim_...
 ```
 
-It reuses the application's existing Firebase `GoogleAuthProvider` flow. After Firebase completes Google authentication, the browser sends only the Firebase ID token to the completion endpoint. Provider access tokens are not stored by Adam or returned to the agent.
-
-The backend requires:
-
-- A valid Firebase ID token
-- `google.com` as the Firebase sign-in provider
-- `email_verified === true`
-- A non-expired registration intent
+The browser uses Firebase Google sign-in and sends the Firebase ID token plus the private claim token to the completion endpoint. Adam verifies the claim token hash, registration expiry, Firebase token, Google provider, and verified email. The claim token is stored only as a hash and is invalidated after successful completion.
 
 ## Registration states
 
@@ -69,16 +42,15 @@ expired
 cancelled
 ```
 
-The intent is single-use and expires after 15 minutes. Start requests are idempotent when the same idempotency key is reused.
+Pending registrations last seven days. The Google interaction itself is short-lived, and installation/runtime sessions have their own expirations.
 
-## Security model
+## Preview and production security
 
-- Agents require explicit registration scopes.
-- Registration state is stored server-side.
-- The registration URL contains no credential.
-- Firebase ID tokens are verified server-side.
-- Raw Google tokens are never stored or logged.
-- The agent receives only scoped registration and workspace identifiers.
-- Rate limiting and idempotency apply to the agent endpoints.
-
-Future providers can be added behind the same registration state machine without changing the CLI contract.
+- Preview assets and bounded mock behavior do not expose account data or provider credentials.
+- The private claim URL is out-of-band and never part of the browser embed.
+- Claimed installations enforce exact allowed origins.
+- Installation keys are scoped browser capabilities, not account credentials.
+- Runtime tokens are short-lived and scoped to one installation, avatar, and session.
+- Trial/subscription entitlement is checked when runtime access is created and authorized.
+- Expired trials produce an inactive public widget state without a billing CTA.
+- Stable workspace, avatar, and installation IDs do not change after claim.

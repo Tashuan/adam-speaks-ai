@@ -25,9 +25,9 @@ Authenticate requests with an Adam agent bearer token. Each tool requires the sc
 | `get_session_status` | Inspect runtime session state | `avatars:read` |
 | `get_claim_status` | Read ownership handoff state | `avatars:read` |
 | `resend_claim_email` | Resend the ownership handoff | `workspaces:provision` |
-| `start_google_registration` | Start hosted user registration | `registrations:create` |
+| `start_google_registration` | Start an origin-bound preview and private claim handoff | `registrations:create` |
 | `get_registration_status` | Read registration state | `registrations:read` |
-| `get_registration_embed` | Retrieve the completed registration embed | `registrations:read` |
+| `get_registration_embed` | Retrieve the preview or owned registration embed | `registrations:read` |
 
 ## Request shape
 
@@ -54,10 +54,11 @@ Responses use a JSON content envelope and include a request ID for troubleshooti
 1. Bootstrap a dynamic client through the REST endpoint if the agent has no Adam credentials; keep the returned secret in the trusted agent environment only.
 2. Obtain a bearer token with `avatars:read`, `registrations:create`, and `registrations:read`.
 3. List templates and ask the user which avatar and use case they want.
-4. Start hosted Google registration with a stable idempotency key and show the authorization URL to the user.
-5. Poll registration status until completion, then retrieve the embed code.
-6. Modify the user's app with the embed; send speech through the app/runtime path.
-7. Explain mock mode and claim/activation when applicable.
+4. Start an origin-bound preview registration with a stable idempotency key and install only the returned embed.
+5. Show the one-time private `claimUrl` directly to the user in trusted chat/terminal; never put it in the webpage.
+6. Poll registration status until completion, then preserve the stable IDs and retrieve the embed code.
+7. Modify the user's app with the embed; send speech through the app/runtime path.
+8. Explain bounded preview/mock mode, trial expiry, and dashboard reactivation.
 
 Use MCP for discovery and agent control. Use browser, REST, or WebSocket speech when the application itself needs runtime delivery.
 

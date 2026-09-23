@@ -142,7 +142,8 @@ paths:
                       $ref: '#/components/schemas/AvatarTemplate'
   /v1/registrations:
     post:
-      summary: Start a hosted Google registration intent
+      summary: Start a preview registration and private Google claim handoff
+      description: Creates a scoped preview installation immediately. The response includes a one-time private authorization URL for the trusted agent to show the user; the URL must never be embedded in the public webpage.
       security:
         - bearerAuth: [registrations:create]
       parameters:
@@ -187,6 +188,7 @@ paths:
       summary: Complete registration from the hosted Google page
       parameters:
         - $ref: '#/components/parameters/RegistrationId'
+        - $ref: '#/components/parameters/RegistrationClaimToken'
       security: []
       responses:
         '200':
@@ -285,6 +287,12 @@ components:
       in: path
       required: true
       schema: { type: string }
+    RegistrationClaimToken:
+      name: X-Registration-Claim-Token
+      in: header
+      required: true
+      description: One-time private claim token delivered out-of-band to the trusted agent/user.
+      schema: { type: string, format: password }
     AvatarId:
       name: avatarId
       in: path
@@ -339,6 +347,8 @@ components:
         templateId: { type: string, nullable: true }
         runtimeConfigRef: { type: string, nullable: true }
         status: { type: string }
+        accessState: { type: string, enum: [active, inactive] }
+        inactiveReason: { type: string, nullable: true }
         ownership: { type: string, enum: [claimed, provisional] }
         speechMode: { type: string, enum: [mock, live] }
         entitlements: { type: object, additionalProperties: true }
@@ -400,7 +410,8 @@ components:
       properties:
         registrationId: { type: string }
         status: { type: string, enum: [google_authorization_required, completed, expired, cancelled] }
-        authorizationUrl: { type: string, format: uri }
+        authorizationUrl: { type: string, format: uri, description: Private URL returned only by POST /registrations; omitted from authenticated status polling. }
+        claimUrl: { type: string, format: uri, description: One-time private URL returned only when a registration is started or its claim token is reissued. Never embed it in a webpage. }
         expiresAt: { type: integer }
         completedAt: { type: integer }
         workspaceId: { type: string }

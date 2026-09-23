@@ -31,7 +31,7 @@ Start with [`docs/INTEGRATION.md`](docs/INTEGRATION.md) for the shortest decisio
 
 ## Website and application embed
 
-A trusted backend or agent provisions an installation and returns an installation ID and browser-visible embed key:
+An agent-created installation starts as an origin-bound preview and becomes owned after the user completes a private Google claim handoff:
 
 ```html
 <script
@@ -41,7 +41,9 @@ A trusted backend or agent provisions an installation and returns an installatio
 </script>
 ```
 
-The browser exchanges the key for a short-lived runtime session. Never put provider keys, agent secrets, Firebase credentials, owner IDs, or account credentials in browser code.
+The browser exchanges the key for a short-lived runtime session. The separate one-time `claimUrl` is shown only in trusted agent/user chat or terminal output. Never put it, provider keys, agent secrets, Firebase credentials, owner IDs, or account credentials in browser code.
+
+A copied claimed or unclaimed embed is rejected for runtime access on an unauthorized origin. Preview behavior is bounded mock behavior and does not expose account data or claim authority.
 
 ## Remote control
 
@@ -68,7 +70,7 @@ Start with [`docs/MCP.md`](docs/MCP.md) for the endpoint, scopes, tool catalog, 
 
 ## CLI
 
-The public CLI source is in [`cli/`](cli/). It requires Node 20 or newer and supports discovery, hosted registration, status polling, and embed generation:
+The public CLI source is in [`cli/`](cli/). It requires Node 20 or newer and supports discovery, preview registration, private claim handoff, status polling, and embed generation:
 
 ```bash
 cd cli
@@ -85,15 +87,17 @@ Read [`docs/CLI.md`](docs/CLI.md) for installation and [`docs/cli/COMMAND_REFERE
 ```text
 bootstrap a minimally scoped agent client
   → obtain a bearer token
-  → choose a template
-  → start hosted Google registration
+  → choose a template and exact website origin
+  → start an origin-bound preview registration
+  → embed the returned preview installation
+  → show the private claimUrl in trusted chat/terminal
   → user signs in once
-  → poll registration and install the returned embed
+  → poll registration and preserve stable IDs
   → connect browser, REST, WebSocket, or MCP control
-  → user manages the claimed avatar later
+  → user manages or reactivates the avatar later
 ```
 
-Provisional workspaces may begin in mock mode. Claiming updates workspace, avatar, installation, and entitlement ownership. `workspaceId`, `avatarId`, and `installationId` remain stable, and later dashboard edits do not require re-embedding.
+Preview behavior is bounded and mock/canned. After claim, avatar rendering and speech follow trial/subscription entitlements. When a trial ends without an active subscription, the public widget becomes inactive without a billing CTA; the owner reactivates from the authenticated Adam account without re-embedding. `workspaceId`, `avatarId`, and `installationId` remain stable.
 
 ## Public contract
 
@@ -110,7 +114,9 @@ Provisional workspaces may begin in mock mode. Claiming updates workspace, avata
 
 - Agent credentials remain server-side.
 - Installation keys are scoped browser capabilities, not account credentials.
+- Claim URLs are one-time private handoff credentials and never belong in browser code or public page content.
 - Runtime tokens are short-lived and scoped to one installation, avatar, and session.
+- Exact website origins are enforced for runtime access.
 - Provisioning is idempotent and rate-limited.
 - Provider credentials never enter the embed or runtime configuration.
 

@@ -11,32 +11,18 @@ Adam is an embeddable, remote-controllable real-time talking avatar for websites
 
 ## Repository guides
 - Integration guide: docs/INTEGRATION.md
-- MCP server guide: docs/MCP.md
-- CLI guide: docs/CLI.md
 - Agent prompt: docs/ai/AGENT_PROMPT.md
 - Quickstart: docs/ai/QUICKSTART.md
-- Authentication: docs/ai/AUTHENTICATION.md
-- Provisioning: docs/ai/PROVISIONING.md
-- Account avatar management: docs/ai/ACCOUNT_AVATARS.md
+- Claim and activation: docs/ai/CLAIM_AND_ACTIVATION.md
 - Embedding: docs/ai/EMBEDDING.md
-- Speech sources: docs/ai/SPEECH_SOURCES.md
-- MCP: docs/ai/MCP.md
+- Authentication: docs/ai/AUTHENTICATION.md
 - OpenAPI: docs/openapi/adam-v1.yaml
-- CLI guide: docs/CLI.md
-- CLI source: cli/
 - Agent skills: skills/adam-integration/SKILL.md
 
-## Use cases
-Adam can be embedded in a website, product, support flow, educational experience, kiosk, event, game, interactive installation, or branded conversation. It can be remotely controlled by an AI system, application, backend service, live operator, or agent.
-
-## MCP server
-The MCP endpoint is https://adam-speaks.com/api/mcp. It exposes template discovery, provisioning, embed generation, session control, speech, registration, and claim-status tools. Read docs/MCP.md for scopes and the tool catalog.
-
-## CLI
-The public Node 20+ CLI is in cli/. Read docs/CLI.md for installation and docs/cli/COMMAND_REFERENCE.md for commands including doctor, avatar templates, registration, and embed generation.
-
 ## Agent guidance
-When asked to add Adam, determine whether the user needs a website embed, application control, or agent provisioning. If the agent has no Adam credentials, bootstrap a minimally scoped dynamic client through `POST /v1/oauth/register` and keep its one-time secret in the trusted agent environment. Then choose a template, start hosted Google registration with a stable idempotency key, ask the user to sign in once, poll completion, install the returned embed, and connect browser, REST, WebSocket, or MCP speech. The user can manage the claimed avatar later without re-embedding it.
+When asked to add Adam, bootstrap a minimally scoped dynamic client if needed, choose a template and exact website origin, and start a registration with a stable idempotency key. Install the returned origin-bound preview embed. Show the returned one-time private `claimUrl` only in the trusted agent/user conversation; never place it in the webpage, source code, logs, or git. After Google sign-in, poll registration status and preserve the stable workspace, avatar, and installation IDs.
+
+Preview behavior is bounded and mock/canned. Trial and subscription entitlements control production runtime access. When a trial ends without an active subscription, the public widget becomes inactive without a billing CTA; the owner reactivates from the authenticated Adam account without re-embedding.
 
 ## Security
-Provider credentials and agent secrets remain server-side. Installation keys are scoped browser capabilities. Runtime tokens are short-lived and scoped to one installation, avatar, and session.
+Provider credentials and agent secrets remain server-side. Claim URLs are one-time private handoff credentials. Installation keys are scoped browser capabilities, exact origins are enforced, and runtime tokens are short-lived and scoped to one installation, avatar, and session.

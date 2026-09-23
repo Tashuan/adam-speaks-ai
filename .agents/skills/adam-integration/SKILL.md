@@ -11,4 +11,4 @@ Before acting, read:
 2. `docs/INTEGRATION.md`
 3. The specific guide under `docs/ai/`, `docs/MCP.md`, or `docs/CLI.md` for the requested path.
 
-Do not invent endpoints, tool names, scopes, or fields. Preserve stable avatar and installation IDs, use idempotency keys, and keep credentials server-side.
+Do not invent endpoints, tool names, scopes, or fields. Preserve stable avatar and installation IDs, use idempotency keys, keep credentials server-side, and treat private claim URLs as one-time handoff credentials that never belong in browser code or public page content.

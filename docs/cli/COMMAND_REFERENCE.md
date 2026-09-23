@@ -18,7 +18,7 @@ adam avatar templates [--format json]
 
 ## `registration start`
 
-Creates a short-lived registration intent and returns a hosted Google sign-in URL.
+Creates a seven-day origin-bound preview registration and returns a preview embed plus a one-time private claim URL. Show the claim URL only in trusted chat or terminal; never put it in the webpage.
 
 ```bash
 adam registration start \
@@ -33,7 +33,7 @@ adam registration start \
 
 ## `registration embed`
 
-Returns the absolute script URL and ready-to-paste HTML for a completed registration.
+Returns the absolute script URL and ready-to-paste HTML for a pending preview or completed registration.
 
 ```bash
 adam registration embed REGISTRATION_ID [--format json]

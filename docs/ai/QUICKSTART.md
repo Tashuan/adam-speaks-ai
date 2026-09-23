@@ -1,6 +1,6 @@
 # AI Agent Quickstart
 
-Adam lets an authenticated agent provision a provisional avatar before the user has an Adam account.
+Adam gives an agent an immediate, origin-bound preview while keeping the ownership handoff private.
 
 ## Flow
 
@@ -8,16 +8,18 @@ Adam lets an authenticated agent provision a provisional avatar before the user 
 dynamic agent client
   → obtain minimal bearer token
   → list avatar templates
-  → start hosted Google registration
-  → user signs in once
-  → poll registration and add generated embed
-  → send text to the speech endpoint
-  → user manages the claimed avatar later
+  → start a bounded preview registration
+  → add the preview embed to the website
+  → show the private claimUrl in trusted chat/terminal
+  → user signs in with Google once
+  → poll registration and retain stable IDs
+  → preview becomes an owned installation
+  → trial/subscription controls runtime access
 ```
 
 ## 1. Bootstrap an agent client
 
-If the agent does not already have Adam credentials, register a minimally scoped client. Keep the returned secret in the trusted agent environment only; never put it in the app or browser bundle.
+If the agent does not already have Adam credentials, register a minimally scoped client. Keep the returned secret in the trusted agent environment only.
 
 ```bash
 curl -X POST https://adam-speaks.com/api/v1/oauth/register \
@@ -25,15 +27,19 @@ curl -X POST https://adam-speaks.com/api/v1/oauth/register \
   -d '{"client_name":"My app agent","idempotency_key":"my-app-adam-setup-001"}'
 ```
 
-Use the returned client credentials to obtain a token with `avatars:read registrations:create registrations:read`.
+Use the returned credentials to obtain a token with `avatars:read registrations:create registrations:read`.
 
-## 2. Start hosted registration
+## 2. Start the preview registration
 
-The agent should list templates, ask the user to choose one, and call `POST /v1/registrations` with the user's website origin and stable idempotency key. Show the returned `authorizationUrl` to the user and poll the registration status after Google sign-in.
+List templates, choose one with the user, and call `POST /v1/registrations` with the exact website origin, consent, and a stable idempotency key.
 
-## 3. Retrieve the completed embed
+The response includes a normal browser embed and a private one-time `claimUrl`. Add only the embed to the website. Show `claimUrl` directly to the user through the trusted agent conversation. Never put the claim URL in HTML, source code, public page text, logs, or git.
 
-After the user completes Google sign-in, poll `GET /v1/registrations/{registrationId}` until `status` is `completed`. The response contains the stable avatar and installation IDs plus the generated embed payload. The agent can then add the embed to the user's app.
+## 3. Complete ownership
+
+The user opens the private URL and clicks the Google sign-in button. Adam verifies the Firebase identity, attaches the existing preview workspace/avatar/installation to that account, and starts or recognizes the account trial.
+
+Poll `GET /v1/registrations/{registrationId}` with the agent token until `status` is `completed`. `workspaceId`, `avatarId`, and `installationId` remain stable.
 
 ## 4. Embed
 
@@ -43,8 +49,10 @@ After the user completes Google sign-in, poll `GET /v1/registrations/{registrati
   data-embed-key="ek_..."></script>
 ```
 
-## 5. Speak
+The installation key is a scoped browser capability. It is never an agent or account credential.
 
-The provisional avatar accepts speech immediately but uses a canned mock response. Live speech becomes available after the workspace is claimed and its entitlements permit it.
+## 5. Trial and inactive states
 
-See [speech sources](./SPEECH_SOURCES.md) for browser, REST, WebSocket, and MCP usage.
+Preview rendering and mock/canned speech can work before ownership is completed. After claim, the server independently evaluates trial/subscription entitlements. When a trial ends without an active subscription, the widget quietly enters its inactive state; it does not show a billing button or redirect public visitors. The owner reactivates from the authenticated Adam account/billing dashboard without re-embedding.
+
+See [claim and activation](./CLAIM_AND_ACTIVATION.md), [embedding](./EMBEDDING.md), and [speech sources](./SPEECH_SOURCES.md).
