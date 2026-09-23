@@ -2,7 +2,7 @@
 
 When asked to add an Adam avatar — including any request to produce a page, snippet, or file containing the embed:
 
-Never output a placeholder embed. A working page needs a real `installationId` and `ek_...` embed key returned by the registration flow below; they cannot be hand-written. Installation, workspace, and avatar IDs are opaque strings with no fixed prefix. If you cannot make network calls, ask the user for the exact website origin and template choice and give them the commands to run instead.
+Never output a placeholder embed. A working page needs a real `installationId` and `ek_...` embed key returned by the registration flow below; they cannot be hand-written. Installation, workspace, and avatar IDs are opaque strings with no fixed prefix. If you cannot make outbound POST calls (e.g. a sandboxed chat environment), do not fabricate values — instead tell the user to run this flow in an IDE agent with network and filesystem tools (Cursor, Devin, Codex, Antigravity, etc.) or give them the `examples/mcp-session.sh` commands to run themselves. Reading public docs with GET is fine; provisioning requires POST.
 
 ## MCP flow (preferred)
 
