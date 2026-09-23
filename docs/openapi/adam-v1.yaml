@@ -426,6 +426,8 @@ components:
         templateId: { type: string }
         name: { type: string }
         description: { type: string }
+        thumbnailUrl: { type: string, format: uri }
+        avatarType: { type: string }
         previewUrl: { type: string, format: uri }
         runtimePresetId: { type: string }
         defaultVoiceId: { type: string }
