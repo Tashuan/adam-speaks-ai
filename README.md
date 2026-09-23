@@ -27,12 +27,13 @@ Do NOT just give me an embed snippet with placeholder values. Run the actual pro
 
 1. Register a minimally scoped dynamic client at POST https://adam-speaks.com/api/v1/oauth/register.
 2. Get a bearer token with scopes: avatars:read registrations:create registrations:read.
-3. List the avatar templates and let me pick one.
+3. List the avatar templates and let me pick one — if only one exists, use it.
 4. Start a preview registration with a stable idempotency key, my website origin, my project name, and consent flags.
-5. Give me the final embed snippet using the real install_ and ek_ values from the registration response — never placeholders.
+5. Give me the final embed snippet using the real installationId and ek_ embed key from the registration response — never placeholders.
 6. Show me the private claimUrl here in chat only — never in the webpage or source code.
 7. After I complete the Google sign-in, poll the registration status and tell me which IDs to save.
 
+If my website origin below is still a placeholder, ask me for the real origin before registering — the embed only works on the exact origin used at registration.
 If you cannot make HTTP requests, give me the exact curl commands to run myself, in order, and tell me where each response value goes.
 
 My website origin: https://your-site.com
@@ -63,7 +64,7 @@ An agent-created installation starts as an origin-bound preview and becomes owne
 ```html
 <script
   src="https://adam-speaks.com/assets/avatar-widget/ai-first-embed.js"
-  data-installation-id="install_..."
+  data-installation-id="Xy9kPq2mN7wRtVb4cL6d"
   data-embed-key="ek_...">
 </script>
 ```

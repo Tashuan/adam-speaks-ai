@@ -1,6 +1,6 @@
 # Adam CLI
 
-The Adam CLI provides a scriptable interface for avatar provisioning, hosted Google registration, embed generation, and operational checks.
+The Adam CLI provides a scriptable interface for avatar discovery, origin-bound preview registration, private claim handoff, embed generation, and operational checks.
 
 ## Local usage
 
@@ -37,7 +37,7 @@ npm run adam -- registration start \
   --accept-privacy
 npm run adam -- registration wait reg_...
 npm run adam -- registration embed reg_... --format json
-npm run adam -- embed generate --installation install_... --key ek_...
+npm run adam -- embed generate --installation <installationId> --key ek_...
 ```
 
 Use `--format json` for agents and CI:

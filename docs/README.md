@@ -44,5 +44,5 @@ Adam connects websites, applications, AI systems, and live experiences to a real
 - Keep provider credentials and agent secrets server-side.
 - Treat installation keys as browser-visible, scoped capabilities.
 - Use a stable idempotency key when provisioning or registering a project.
-- Preserve `avatarId` and `installationId` after claim.
+- Preserve `workspaceId`, `avatarId`, and `installationId` after claim.
 - Update the relevant Markdown guide and [`openapi/adam-v1.yaml`](./openapi/adam-v1.yaml) together when an API contract changes.

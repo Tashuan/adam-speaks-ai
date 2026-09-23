@@ -12,4 +12,6 @@ The private claim token—not an email supplied by the agent—is the handoff ca
 
 All provisioning and registration workflows are idempotent; always provide a stable idempotency key. Concurrent retries with the same key resolve to one resource result. Pending preview registrations expire after seven days. Claimed installations preserve stable workspace, avatar, and installation IDs.
 
+Provisioning and resend email are rate-limited independently by target email, agent client, origin, IP, and global mail budget. Dynamic client registration has a separate per-fingerprint limit and can be disabled with `ADAM_DYNAMIC_AGENT_REGISTRATION_ENABLED=false`.
+
 Preview assets and mock behavior are bounded. Claimed installations enforce exact website origins and trial/subscription entitlements. An expired trial produces an inactive public widget state without a billing CTA; the owner reactivates from the authenticated Adam account.

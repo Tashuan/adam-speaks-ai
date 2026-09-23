@@ -39,15 +39,15 @@ Response: `{ "access_token": "...", "token_type": "Bearer", "expires_in": 3600 }
 
 ## 2. Start the preview registration
 
-List templates and choose one with the user:
+List templates and choose one with the user. This endpoint is public and does not require the token:
 
 ```bash
 curl https://adam-speaks.com/api/v1/avatar-templates
 ```
 
-Response: `{ "templates": [{ "templateId": "template_friendly_01", "name": "...", "description": "...", "avatarType": "...", "thumbnailUrl": "..." }] }`
+Response: `{ "templates": [{ "templateId": "template_friendly_01", "name": "...", "description": "...", "runtimePresetId": "...", "capabilities": [...], "status": "active" }] }`
 
-Then call `POST /v1/registrations` with the exact website origin (including `https://`, no path), consent, and a stable idempotency key:
+Then call `POST /v1/registrations` with the exact website origin, consent, and a stable idempotency key. The origin is scheme + host + optional port with no path — e.g. `https://example.com` for a site or `http://localhost:8123` for local development. `displayName` is the site owner's name; `projectName` labels the workspace.
 
 ```bash
 curl -X POST https://adam-speaks.com/api/v1/registrations \
@@ -63,18 +63,27 @@ Response:
   "registrationId": "reg_...",
   "status": "google_authorization_required",
   "claimUrl": "https://adam-speaks.com/auth/agent/google?registrationId=reg_...#claim=claim_...",
-  "workspaceId": "ws_...",
-  "avatarId": "av_...",
-  "installationId": "install_...",
+  "authorizationUrl": "https://adam-speaks.com/auth/agent/google?registrationId=reg_...#claim=claim_...",
+  "workspaceId": "wK8pQ2mN9xRtYhB4vC6d",
+  "avatarId": "aF3jL7pR1sT9wX2bN5kM",
+  "installationId": "Xy9kPq2mN7wRtVb4cL6d",
+  "speechMode": "mock",
   "embed": {
-    "installationId": "install_...",
+    "installationId": "Xy9kPq2mN7wRtVb4cL6d",
     "embedKey": "ek_...",
     "scriptUrl": "https://adam-speaks.com/assets/avatar-widget/ai-first-embed.js",
-    "html": "<script src=\"...\" data-installation-id=\"install_...\" data-embed-key=\"ek_...\"></script>"
+    "html": "<script src=\"...\" data-installation-id=\"Xy9kPq2mN7wRtVb4cL6d\" data-embed-key=\"ek_...\"></script>"
+  },
+  "speech": {
+    "browserExample": "window.AdamAvatar.speak(\"Hello\");",
+    "restEndpoint": "/v1/installations/Xy9kPq2mN7wRtVb4cL6d/speech",
+    "websocketEndpoint": "/v1/runtime-sessions/{sessionId}/stream"
   },
   "expiresAt": 1234567890000
 }
 ```
+
+`workspaceId`, `avatarId`, and `installationId` are opaque strings with no fixed prefix. Prefixed values are `registrationId` (`reg_`), `embedKey` (`ek_`), client credentials (`ac_`/`as_`), and claim tokens (`claim_`). Do not validate IDs by prefix.
 
 `embed.html` is the ready-to-paste snippet with real values; `embed.installationId` and `embed.embedKey` are the same values as discrete fields. Add only the embed to the website. Show `claimUrl` directly to the user through the trusted agent conversation. Never put the claim URL in HTML, source code, public page text, logs, or git.
 
@@ -84,15 +93,15 @@ Retry safety uses the body `idempotencyKey`; the optional `X-Request-ID` header 
 
 The user opens the private URL and clicks the Google sign-in button. Adam verifies the Firebase identity, attaches the existing preview workspace/avatar/installation to that account, and starts or recognizes the account trial.
 
-Poll `GET /v1/registrations/{registrationId}` with the agent token until `status` is `completed`. The status moves from `google_authorization_required` to `completed`, or `expired` once `expiresAt` passes (7 days). The response has the same shape minus `claimUrl`/`authorizationUrl`. `workspaceId`, `avatarId`, and `installationId` remain stable.
+Poll `GET /v1/registrations/{registrationId}` with the agent token until `status` is `completed`. The status moves from `google_authorization_required` to `completed`, or `expired` once `expiresAt` passes (7 days). The response has the same shape with `claimUrl` omitted and `authorizationUrl` set to `null`. `workspaceId`, `avatarId`, and `installationId` remain stable.
 
 ## 4. Embed
 
-Emit this file only with the real `install_`/`ek_` values returned in step 2; a page with placeholders cannot create a runtime session.
+Emit this file only with the real `installationId` and `ek_` embed key returned in step 2; a page with placeholders cannot create a runtime session.
 
 ```html
 <script src="https://adam-speaks.com/assets/avatar-widget/ai-first-embed.js"
-  data-installation-id="install_..."
+  data-installation-id="Xy9kPq2mN7wRtVb4cL6d"
   data-embed-key="ek_..."></script>
 ```
 

@@ -2,12 +2,12 @@
 
 An agent-created Adam embed starts as an origin-bound preview and becomes a production installation after the user completes the private claim handoff.
 
-The `install_...` and `ek_...` values below come from the registration flow in [the quickstart](./QUICKSTART.md) and cannot be hand-written. If you are producing this page for a user and do not have real values, run the provisioning flow first — a placeholder page cannot create a runtime session. If you cannot call the API yourself, ask the user for the exact website origin and template choice and give them the commands to run.
+The `installationId` and `ek_...` embed key values below come from the registration flow in [the quickstart](./QUICKSTART.md) and cannot be hand-written. Installation IDs are opaque strings with no fixed prefix. If you are producing this page for a user and do not have real values, run the provisioning flow first — a placeholder page cannot create a runtime session. If you cannot call the API yourself, ask the user for the exact website origin and template choice and give them the commands to run.
 
 ```html
 <script
   src="https://adam-speaks.com/assets/avatar-widget/ai-first-embed.js"
-  data-installation-id="install_..."
+  data-installation-id="Xy9kPq2mN7wRtVb4cL6d"
   data-embed-key="ek_..."></script>
 ```
 

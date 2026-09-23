@@ -21,7 +21,7 @@ Adam is an embeddable, remote-controllable real-time talking avatar. It can be c
 
 ## Standard workflow
 
-A working embed requires real `install_`/`ek_` values returned by a registration response; they cannot be hand-written. Never emit placeholder embed code — if the values do not exist yet, the provisioning workflow is the task.
+A working embed requires a real `installationId` and `ek_` embed key returned by a registration response; they cannot be hand-written. Installation, workspace, and avatar IDs are opaque strings with no fixed prefix — do not validate them by prefix. Never emit placeholder embed code — if the values do not exist yet, the provisioning workflow is the task.
 
 1. Clarify the use case: website embed, application control, agent provisioning, or MCP control.
 2. If the agent has no Adam credentials, register a minimally scoped dynamic client at `POST /v1/oauth/register`; keep the one-time secret only in the trusted agent environment.
@@ -92,12 +92,12 @@ Never write the returned secret into app source, browser code, `.env` files, log
 
 ## Website embed
 
-Use only installation details returned by a registration response or a trusted backend. If you do not have real `install_`/`ek_` values, run the provisioning workflow first — never emit this snippet with placeholders. The same snippet renders the bounded preview before claim and the owned installation after claim:
+Use only installation details returned by a registration response or a trusted backend. If you do not have a real `installationId` and `ek_` embed key, run the provisioning workflow first — never emit this snippet with placeholders. The same snippet renders the bounded preview before claim and the owned installation after claim:
 
 ```html
 <script
   src="https://adam-speaks.com/assets/avatar-widget/ai-first-embed.js"
-  data-installation-id="install_..."
+  data-installation-id="Xy9kPq2mN7wRtVb4cL6d"
   data-embed-key="ek_...">
 </script>
 ```

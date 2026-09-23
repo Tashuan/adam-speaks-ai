@@ -2,7 +2,7 @@
 
 When asked to add an Adam avatar — including any request to produce a page, snippet, or file containing the embed:
 
-Never output a placeholder embed. A working page needs a real `install_...` installation ID and `ek_...` embed key returned by the registration flow below; they cannot be hand-written. If you cannot make network calls, ask the user for the exact website origin and template choice and give them the commands to run instead.
+Never output a placeholder embed. A working page needs a real `installationId` and `ek_...` embed key returned by the registration flow below; they cannot be hand-written. Installation, workspace, and avatar IDs are opaque strings with no fixed prefix. If you cannot make network calls, ask the user for the exact website origin and template choice and give them the commands to run instead.
 
 1. If no Adam agent credential is available, register a minimally scoped dynamic client at `/v1/oauth/register`; keep its one-time secret only in the trusted agent environment.
 2. Obtain a token with `avatars:read`, `registrations:create`, and `registrations:read`.

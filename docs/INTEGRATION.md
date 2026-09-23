@@ -34,7 +34,7 @@ The agent should:
 4. List templates and choose one with the user.
 5. Start an origin-bound preview registration with the user's website origin and a stable idempotency key.
 6. Install the returned preview snippet and show the private one-time `claimUrl` only in trusted chat or terminal.
-7. Ask the user to sign in once, then poll registration status and preserve stable avatar and installation IDs.
+7. Ask the user to sign in once, then poll registration status and preserve the stable workspace, avatar, and installation IDs.
 8. Explain bounded preview/mock behavior, trial expiry, inactive public state, and dashboard reactivation without re-embedding.
 
 Read [AI quickstart](./ai/QUICKSTART.md), [Provisioning](./ai/PROVISIONING.md), and [Claim and activation](./ai/CLAIM_AND_ACTIVATION.md).
@@ -54,14 +54,15 @@ Read [CLI overview](./cli/README.md).
 ## Resource model
 
 ```text
-trusted controller
+agent credentials
+  → workspace
   → stable avatar
   → scoped installation
   → short-lived runtime session
   → speech and animation events
 ```
 
-An AI agent is one controller type; browser code, backend services, applications, and live operators can use the same runtime model. `avatarId` and `installationId` are stable resource identifiers. `sessionId` and runtime tokens are temporary.
+An AI agent is one controller type; browser code, backend services, applications, and live operators can use the same runtime model. `workspaceId`, `avatarId`, and `installationId` are stable resource identifiers. `sessionId` and runtime tokens are temporary.
 
 ## Security checklist
 
