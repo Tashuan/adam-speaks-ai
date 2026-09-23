@@ -409,15 +409,22 @@ components:
       required: [registrationId, status, expiresAt]
       properties:
         registrationId: { type: string }
-        status: { type: string, enum: [google_authorization_required, completed, expired, cancelled] }
-        authorizationUrl: { type: string, format: uri, description: Private URL returned only by POST /registrations; omitted from authenticated status polling. }
+        status: { type: string, enum: [google_authorization_required, completed, expired] }
+        authorizationUrl: { type: string, format: uri, nullable: true, description: Private URL returned only when a registration is started or its claim token is reissued; null on status reads. }
         claimUrl: { type: string, format: uri, description: One-time private URL returned only when a registration is started or its claim token is reissued. Never embed it in a webpage. }
         expiresAt: { type: integer }
         completedAt: { type: integer }
         workspaceId: { type: string }
         avatarId: { type: string }
         installationId: { type: string }
-        embed: { type: object, additionalProperties: true }
+        embed:
+          type: object
+          properties:
+            installationId: { type: string }
+            embedKey: { type: string }
+            scriptUrl: { type: string, format: uri }
+            html: { type: string, description: Ready-to-paste script tag containing the real installation values. }
+          additionalProperties: true
         speech: { type: object, additionalProperties: true }
     AvatarTemplate:
       type: object

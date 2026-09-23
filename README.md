@@ -16,6 +16,31 @@ This repository contains the public integration contract for developers and AI a
 - Agent skills: [`skills/README.md`](skills/README.md)
 - OpenAPI contract: [`docs/openapi/adam-v1.yaml`](docs/openapi/adam-v1.yaml)
 
+## Give this prompt to your AI agent
+
+Paste this into ChatGPT, Claude, or your coding agent to start the real provisioning flow — it returns a working embed, not a placeholder snippet:
+
+```text
+I want you to add an Adam talking avatar to my website. The integration contract is at https://github.com/Tashuan/adam-speaks-ai — read llms.txt, docs/ai/AGENT_PROMPT.md, and docs/ai/QUICKSTART.md before doing anything.
+
+Do NOT just give me an embed snippet with placeholder values. Run the actual provisioning flow:
+
+1. Register a minimally scoped dynamic client at POST https://adam-speaks.com/api/v1/oauth/register.
+2. Get a bearer token with scopes: avatars:read registrations:create registrations:read.
+3. List the avatar templates and let me pick one.
+4. Start a preview registration with a stable idempotency key, my website origin, my project name, and consent flags.
+5. Give me the final embed snippet using the real install_ and ek_ values from the registration response — never placeholders.
+6. Show me the private claimUrl here in chat only — never in the webpage or source code.
+7. After I complete the Google sign-in, poll the registration status and tell me which IDs to save.
+
+If you cannot make HTTP requests, give me the exact curl commands to run myself, in order, and tell me where each response value goes.
+
+My website origin: https://your-site.com
+Project name: My project
+```
+
+If you are the agent reading this: the prompt above is a request to run the flow in [`docs/ai/QUICKSTART.md`](docs/ai/QUICKSTART.md), not to emit a page with placeholder values.
+
 ## Choose a path
 
 | You want to… | Read |
