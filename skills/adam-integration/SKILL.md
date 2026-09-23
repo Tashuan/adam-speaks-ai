@@ -5,7 +5,7 @@ description: Discover, provision, embed, and remotely control Adam real-time tal
 
 # Adam integration skill
 
-Use this skill whenever a user asks to add, embed, control, provision, or troubleshoot an Adam avatar.
+Use this skill whenever a user asks to add, embed, control, provision, or troubleshoot an Adam avatar — including requests to generate a page, snippet, or file containing the embed.
 
 Adam is an embeddable, remote-controllable real-time talking avatar. It can be controlled by an AI system, web application, backend service, live operator, game, kiosk, event experience, or agent. It provides speech, lip-sync, expressions, and motion.
 
@@ -20,6 +20,8 @@ Adam is an embeddable, remote-controllable real-time talking avatar. It can be c
 - Exact endpoints and schemas: read `docs/openapi/adam-v1.yaml`.
 
 ## Standard workflow
+
+A working embed requires real `install_`/`ek_` values returned by a registration response; they cannot be hand-written. Never emit placeholder embed code — if the values do not exist yet, the provisioning workflow is the task.
 
 1. Clarify the use case: website embed, application control, agent provisioning, or MCP control.
 2. If the agent has no Adam credentials, register a minimally scoped dynamic client at `POST /v1/oauth/register`; keep the one-time secret only in the trusted agent environment.
@@ -90,7 +92,7 @@ Never write the returned secret into app source, browser code, `.env` files, log
 
 ## Website embed
 
-Use installation details returned by a trusted backend or agent. The same snippet can render the bounded preview before claim and the owned installation after claim:
+Use only installation details returned by a registration response or a trusted backend. If you do not have real `install_`/`ek_` values, run the provisioning workflow first — never emit this snippet with placeholders. The same snippet renders the bounded preview before claim and the owned installation after claim:
 
 ```html
 <script
@@ -120,3 +122,4 @@ The private `claimUrl` is not part of the snippet. Show it only in the trusted a
 - If a preview avatar speaks in mock mode, explain that the private claim handoff, trial, and subscription entitlements control production behavior.
 - If the user needs runtime speech from an application, use browser, REST, or WebSocket documentation rather than MCP-only guidance.
 - If a request requires an unsupported capability, say so and point to the closest documented transport.
+- If you cannot make network calls, ask for the exact website origin and template choice and give the user the CLI or curl commands to run; do not produce a placeholder page.

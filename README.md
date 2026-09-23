@@ -31,6 +31,8 @@ Start with [`docs/INTEGRATION.md`](docs/INTEGRATION.md) for the shortest decisio
 
 ## Website and application embed
 
+A working embed requires a real `installationId` and `embedKey` returned by the registration flow in [`docs/ai/QUICKSTART.md`](docs/ai/QUICKSTART.md); they cannot be hand-written. If you are an agent asked to produce an embed, snippet, or page and do not already have these values, run the provisioning flow first — never ship placeholders. If you cannot make network calls, ask the user for the exact website origin and template choice, then give them the commands to run.
+
 An agent-created installation starts as an origin-bound preview and becomes owned after the user completes a private Google claim handoff:
 
 ```html

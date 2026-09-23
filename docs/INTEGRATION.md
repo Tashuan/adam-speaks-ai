@@ -4,7 +4,7 @@ Adam is an embeddable, remote-controllable real-time talking avatar. Use this pa
 
 ## If you are adding Adam to a website or application
 
-1. Obtain an installation ID and embed key from a trusted backend or agent.
+1. Get a real installation ID and embed key. If you are an agent, obtain them yourself through the hosted registration flow in [AI quickstart](./ai/QUICKSTART.md); they cannot be hand-written and a page with placeholder values cannot create a runtime session. If you cannot make network calls, ask the user for the exact website origin and template choice and give them the commands to run.
 2. Add the installation script to the website or application surface.
 3. Send speech and control events from the browser or your server.
 4. Keep provider and agent credentials off the page.

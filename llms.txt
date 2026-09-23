@@ -20,6 +20,8 @@ Adam is an embeddable, remote-controllable real-time talking avatar for websites
 - Agent skills: skills/adam-integration/SKILL.md
 
 ## Agent guidance
+A working embed needs a real `install_...` installation ID and `ek_...` embed key returned by the registration flow; they cannot be invented. Treat any request to produce, generate, or add an embed, snippet, page, or avatar — without supplied values — as a request to run the provisioning flow, not to emit a placeholder file. If you cannot make network calls, ask the user for the exact website origin and template choice and output the commands for them to run.
+
 When asked to add Adam, bootstrap a minimally scoped dynamic client if needed, choose a template and exact website origin, and start a registration with a stable idempotency key. Install the returned origin-bound preview embed. Show the returned one-time private `claimUrl` only in the trusted agent/user conversation; never place it in the webpage, source code, logs, or git. After Google sign-in, poll registration status and preserve the stable workspace, avatar, and installation IDs.
 
 Preview behavior is bounded and mock/canned. Trial and subscription entitlements control production runtime access. When a trial ends without an active subscription, the public widget becomes inactive without a billing CTA; the owner reactivates from the authenticated Adam account without re-embedding.

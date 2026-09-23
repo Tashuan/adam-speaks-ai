@@ -43,6 +43,8 @@ Poll `GET /v1/registrations/{registrationId}` with the agent token until `status
 
 ## 4. Embed
 
+Emit this file only with the real `install_`/`ek_` values returned in step 2; a page with placeholders cannot create a runtime session.
+
 ```html
 <script src="https://adam-speaks.com/assets/avatar-widget/ai-first-embed.js"
   data-installation-id="install_..."
