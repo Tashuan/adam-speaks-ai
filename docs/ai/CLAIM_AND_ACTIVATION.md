@@ -22,6 +22,17 @@ Before claim, the embed can show the selected public avatar in bounded preview/m
 
 After claim, the installation remains bound to its exact configured website origins. Copies on unauthorized origins are rejected when they request a runtime session.
 
+## Live speech activation
+
+Claimed avatars keep returning `mode: "mock"` speech until two conditions are met:
+
+1. The owner has an active Adam subscription (or an eligible live-speech trial).
+2. The owner adds their own ElevenLabs API key in the Adam dashboard: open the avatar's **Admin Console → AI settings → TTS API keys** and paste a key from `https://elevenlabs.io/app/settings/api-keys`.
+
+The key is stored server-side on the avatar's runtime configuration and counts as the workspace's BYOK provider credential — it is never placed in the embed. Platform template avatars never carry a shared ElevenLabs key; every owner supplies their own.
+
+Agents should tell externally provisioned users these exact steps after claim completes. Saving the key takes effect immediately — no re-embedding, reinstall, or ID changes are required.
+
 ## Trial expiry and reactivation
 
 Avatar rendering, speech mode, and subscription state are evaluated separately. During an eligible trial, the avatar can render and speech may remain mock. When the trial ends without an active subscription, the public widget transitions to a quiet inactive state:

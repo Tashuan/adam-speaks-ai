@@ -52,6 +52,7 @@ The update endpoint accepts only avatar presentation/behavior fields and `allowe
 4. Adam binds the workspace/avatar/installation to the verified Firebase account.
 5. The agent polls registration status and preserves the stable embed IDs.
 6. The user can later manage or reactivate the avatar from the dashboard without asking the agent to reinstall it.
+7. Live speech unlocks when the owner has an active subscription and adds their own ElevenLabs API key in the avatar's Admin → AI settings → TTS API keys. Until then, `speechMode` stays `mock`.
 
 ## Security
 

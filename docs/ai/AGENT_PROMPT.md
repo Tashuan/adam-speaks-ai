@@ -16,7 +16,8 @@ Connect to `https://adam-speaks.com/api/mcp` (see `/.well-known/adam-agent.json`
 6. `wait_for_claim` — waits server-side; a timeout returns a resumable `user_action_required` state, so call it again until `status` is `completed`.
 7. `verify_installation` — pass `installationId`, `origin`, and `embedKey` to check the live page, key validity, and a runtime session smoke test; act on `nextAction`.
 8. Explain that preview speech is mock/canned, claimed avatars follow trial/subscription entitlements, and an expired trial produces an inactive public widget state with no billing CTA.
-9. If the avatar becomes inactive, direct the user to log in to Adam and reactivate it from the account/billing dashboard; do not change the embed IDs. `deactivate_installation`/`reactivate_installation` manage agent-disabled state only.
+9. To unlock live speech, tell the user both requirements: an active Adam subscription, and their own ElevenLabs API key saved in the Adam dashboard (avatar Admin Console → AI settings → TTS API keys; keys come from `https://elevenlabs.io/app/settings/api-keys`). Speech stays `mode: "mock"` until both are in place. Templates never carry a provider key; every owner supplies their own.
+10. If the avatar becomes inactive, direct the user to log in to Adam and reactivate it from the account/billing dashboard; do not change the embed IDs. `deactivate_installation`/`reactivate_installation` manage agent-disabled state only.
 
 ## REST flow (self-managed credentials)
 
@@ -28,4 +29,4 @@ Connect to `https://adam-speaks.com/api/mcp` (see `/.well-known/adam-agent.json`
 6. Show the private `claimUrl` directly to the user in the trusted chat or terminal. `POST /v1/registrations/{id}/claim-url` reissues it if needed.
 7. `POST /v1/registrations/{id}/wait` or poll status. After Google sign-in, preserve the returned workspace, avatar, and installation IDs and confirm the permanent embed.
 8. `POST /v1/installations/{id}/verify` confirms the live embed.
-9. Explain bounded preview/mock behavior, trial expiry, inactive public state, and dashboard reactivation without re-embedding.
+9. Explain bounded preview/mock behavior, trial expiry, inactive public state, and dashboard reactivation without re-embedding. For live speech, the user needs an active subscription plus their own ElevenLabs API key added in the avatar's Admin → AI settings.

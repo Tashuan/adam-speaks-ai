@@ -27,4 +27,4 @@ accepted → queued → started → audio_started → completed
                          ↘ failed
 ```
 
-Provisional workspaces return `mode: mock` and never call a billable provider.
+Provisional workspaces return `mode: mock` and never call a billable provider. Claimed workspaces also stay in `mock` until the owner has an active subscription and has added their own ElevenLabs API key in the Adam dashboard (Admin → AI settings → TTS API keys); see [claim and activation](./CLAIM_AND_ACTIVATION.md).

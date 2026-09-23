@@ -132,4 +132,6 @@ The embed block also carries a machine-readable recipe for coding agents: `integ
 
 Preview rendering and mock/canned speech can work before ownership is completed. After claim, the server independently evaluates trial/subscription entitlements. When a trial ends without an active subscription, the widget quietly enters its inactive state; it does not show a billing button or redirect public visitors. The owner reactivates from the authenticated Adam account/billing dashboard without re-embedding.
 
+Live speech additionally requires the owner's own ElevenLabs API key: they add it in the Adam dashboard under the avatar's **Admin → AI settings → TTS API keys**. Until an active subscription and key are both in place, speech requests return `mode: "mock"`. See [claim and activation](./CLAIM_AND_ACTIVATION.md).
+
 See [claim and activation](./CLAIM_AND_ACTIVATION.md), [embedding](./EMBEDDING.md), and [speech sources](./SPEECH_SOURCES.md).

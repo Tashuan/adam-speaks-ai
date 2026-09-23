@@ -32,8 +32,9 @@ A working embed requires a real `installationId` and `ek_` embed key returned by
 7. Wait for Google sign-in (`wait_for_claim` / `POST /v1/registrations/{id}/wait`) and preserve the returned `workspaceId`, `avatarId`, `installationId`, and registration identifiers.
 8. Verify the live install with `verify_installation` / `POST /v1/installations/{id}/verify` and act on `nextAction`.
 9. Explain that preview behavior is bounded and mock/canned; after claim, avatar rendering and speech follow trial/subscription entitlements.
-10. If a trial ends, explain that the public widget becomes inactive without a billing CTA and that the owner reactivates from the Adam account dashboard without re-embedding.
-11. Send speech through browser, REST, WebSocket, or MCP control.
+10. For live speech, tell the user both requirements: an active Adam subscription and their own ElevenLabs API key saved in the Adam dashboard (avatar Admin Console → AI settings → TTS API keys). Speech stays `mode: "mock"` until both are in place; templates never carry a provider key.
+11. If a trial ends, explain that the public widget becomes inactive without a billing CTA and that the owner reactivates from the Adam account dashboard without re-embedding.
+12. Send speech through browser, REST, WebSocket, or MCP control.
 
 ## MCP server
 
@@ -131,7 +132,7 @@ The private `claimUrl` is not part of the snippet. Show it only in the trusted a
 
 - If the user has not chosen a template, list templates before provisioning.
 - If provisioning is retried, reuse the same idempotency key.
-- If a preview avatar speaks in mock mode, explain that the private claim handoff, trial, and subscription entitlements control production behavior.
+- If a preview avatar speaks in mock mode, explain that the private claim handoff, trial, and subscription entitlements control production behavior. A claimed avatar still returns `mode: "mock"` until the owner has an active subscription and adds their own ElevenLabs API key in the avatar's Admin → AI settings; direct the user there rather than changing the embed.
 - If the user needs runtime speech from an application, use browser, REST, or WebSocket documentation rather than MCP-only guidance.
 - If a request requires an unsupported capability, say so and point to the closest documented transport.
 - If you cannot make network calls, ask for the exact website origin and template choice and give the user the CLI or curl commands to run; do not produce a placeholder page.
