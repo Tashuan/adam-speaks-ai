@@ -8,6 +8,8 @@ The agent should show the URL directly in the user’s trusted chat or terminal.
 
 The claim token is high entropy, stored only as a hash, expires with the pending registration, and is burned after successful completion.
 
+While the claim is outstanding, registration responses carry `state: "user_action_required"`, `action: "google_claim"`. If the link must be shown again, `POST /v1/registrations/{id}/claim-url` (MCP: `get_claim_url`) mints a fresh one-time URL for the owned pending registration. Agents can block on `POST /v1/registrations/{id}/wait` (MCP: `wait_for_claim`) instead of polling; a timeout returns the same resumable pending state.
+
 ## Google ownership
 
 The user opens the private URL and clicks Continue with Google. Adam verifies a Firebase ID token from a verified Google account. The verified Firebase UID—not an email supplied by the agent—determines ownership.

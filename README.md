@@ -88,13 +88,13 @@ Supported transports include browser, REST, WebSocket, and MCP. Each uses the sa
 
 ## MCP server
 
-Adam's MCP endpoint gives scoped agents a direct control surface for template discovery, embed generation, session creation, speech, registration, and claim status. New agents bootstrap through the REST dynamic-client endpoint before connecting to MCP; direct workspace provisioning remains restricted to approved clients:
+Adam's MCP endpoint gives agents a direct control surface for template discovery, composite provisioning, embed generation, installation verification and lifecycle, session creation, speech, and the private claim handoff. It speaks standard MCP JSON-RPC (`initialize`/`tools/list`/`tools/call`); `initialize` creates an anonymous session and the first privileged call lazily bootstraps a scoped dynamic client server-side, so the model never handles credentials. Agents that already hold credentials can call `tools/call` statelessly with a bearer token:
 
 ```text
 POST https://adam-speaks.com/api/mcp
 ```
 
-Start with [`docs/MCP.md`](docs/MCP.md) for the endpoint, scopes, tool catalog, request shape, and recommended agent flow.
+Discovery: [`/.well-known/adam-agent.json`](https://adam-speaks.com/.well-known/adam-agent.json) plus standard RFC 9728/8414 OAuth metadata. Start with [`docs/MCP.md`](docs/MCP.md) for the endpoint, auth modes, tool catalog, request shape, and recommended agent flow.
 
 ## CLI
 
@@ -113,15 +113,14 @@ Read [`docs/CLI.md`](docs/CLI.md) for installation and [`docs/cli/COMMAND_REFERE
 ## Agent flow
 
 ```text
-bootstrap a minimally scoped agent client
-  → obtain a bearer token
+initialize an anonymous MCP session (or use a bearer token)
   → choose a template and exact website origin
   → start an origin-bound preview registration
-  → embed the returned preview installation
+  → embed the returned preview installation (your own repo tools, or hand the user the snippet)
   → show the private claimUrl in trusted chat/terminal
   → user signs in once
-  → poll registration and preserve stable IDs
-  → connect browser, REST, WebSocket, or MCP control
+  → wait_for_claim, then verify_installation on the live page
+  → preserve stable IDs; connect browser, REST, WebSocket, or MCP control
   → user manages or reactivates the avatar later
 ```
 

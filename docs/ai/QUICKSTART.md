@@ -2,7 +2,24 @@
 
 Adam gives an agent an immediate, origin-bound preview while keeping the ownership handoff private.
 
-## Flow
+## MCP path (recommended)
+
+The simplest integration is the MCP server at `https://adam-speaks.com/api/mcp`. `initialize` returns an anonymous `Mcp-Session-Id`; no credentials are needed up front. The first privileged tool call lazily creates a minimally scoped dynamic client server-side — the model never handles a `client_secret` or bearer token.
+
+```text
+initialize → anonymous MCP session
+  → list_avatar_templates
+  → start_google_registration (real install_/ek_ embed; no claimUrl in the result)
+  → install the embed with your own filesystem/GitHub tools, or hand it to the user
+  → get_claim_url (only source of the private URL; show it in this conversation)
+  → user signs in with Google once
+  → wait_for_claim (server-side wait, resumable)
+  → verify_installation (granular checks + nextAction)
+```
+
+Pending registrations report `state: "user_action_required"`, `action: "google_claim"` so the agent knows exactly when the human step is outstanding. The REST flow below remains available for agents that manage their own credentials.
+
+## REST flow
 
 ```text
 dynamic agent client
@@ -93,7 +110,9 @@ Retry safety uses the body `idempotencyKey`; the optional `X-Request-ID` header 
 
 The user opens the private URL and clicks the Google sign-in button. Adam verifies the Firebase identity, attaches the existing preview workspace/avatar/installation to that account, and starts or recognizes the account trial.
 
-Poll `GET /v1/registrations/{registrationId}` with the agent token until `status` is `completed`. The status moves from `google_authorization_required` to `completed`, or `expired` once `expiresAt` passes (7 days). The response has the same shape with `claimUrl` omitted and `authorizationUrl` set to `null`. `workspaceId`, `avatarId`, and `installationId` remain stable.
+Poll `GET /v1/registrations/{registrationId}` with the agent token until `status` is `completed`, or call `POST /v1/registrations/{registrationId}/wait` with `{ "timeoutSeconds": 120 }` to wait server-side (MCP: `wait_for_claim`). The status moves from `google_authorization_required` to `completed`, or `expired` once `expiresAt` passes (7 days). While pending, responses carry `state: "user_action_required"`, `action: "google_claim"`. The completed response omits `claimUrl` and sets `authorizationUrl` to `null`. `workspaceId`, `avatarId`, and `installationId` remain stable.
+
+If the user needs the link again, `POST /v1/registrations/{registrationId}/claim-url` (MCP: `get_claim_url`) mints a fresh one-time URL for the pending registration.
 
 ## 4. Embed
 
@@ -106,6 +125,8 @@ Emit this file only with the real `installationId` and `ek_` embed key returned 
 ```
 
 The installation key is a scoped browser capability. It is never an agent or account credential.
+
+The embed block also carries a machine-readable recipe for coding agents: `integration: { type: "script", placement: "body", requires: [] }` and `verification.recommendedPageUrl`. After installing, call `POST /v1/installations/{installationId}/verify` (MCP: `verify_installation`) — it checks installation state, origin binding, entitlements, fetches the page for the embed tag, and optionally smoke-tests a runtime session when you pass `embedKey`. The response reports per-check results and a `nextAction` such as `install_embed` or `fix_installation_id`.
 
 ## 5. Trial and inactive states
 

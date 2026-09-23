@@ -41,7 +41,9 @@ Read [AI quickstart](./ai/QUICKSTART.md), [Provisioning](./ai/PROVISIONING.md), 
 
 ## If an agent needs direct tool discovery
 
-Use the MCP contract to discover templates, provision avatars, create sessions, retrieve embed code, send speech, and check claim status.
+Use the MCP server at `POST /api/mcp`. It speaks standard MCP JSON-RPC (`initialize`/`tools/list`/`tools/call`), supports anonymous sessions that lazily bootstrap credentials server-side, and exposes tools to discover templates, provision avatars, install and verify embeds, wait for the private claim, manage installation lifecycle, create sessions, and send speech.
+
+Discovery: `GET /.well-known/adam-agent.json` (Adam manifest), `GET /.well-known/oauth-protected-resource` and `GET /.well-known/oauth-authorization-server` (standard OAuth metadata for MCP clients).
 
 Read [MCP](./ai/MCP.md).
 

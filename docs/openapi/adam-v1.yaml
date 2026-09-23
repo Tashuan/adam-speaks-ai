@@ -201,6 +201,145 @@ paths:
           $ref: '#/components/responses/Error'
         '410':
           $ref: '#/components/responses/Error'
+  /v1/registrations/{registrationId}/claim-url:
+    post:
+      summary: Mint a fresh one-time private claim URL
+      description: Returns the private Google claim URL for a pending registration owned by the calling agent client. The URL must be shown only to the user through the trusted agent conversation and never placed in webpage source, files, logs, or git.
+      security:
+        - bearerAuth: [registrations:read]
+      parameters:
+        - $ref: '#/components/parameters/RegistrationId'
+        - $ref: '#/components/parameters/RequestId'
+      responses:
+        '200':
+          description: Fresh private claim URL
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimUrlResponse'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '410':
+          $ref: '#/components/responses/Error'
+  /v1/registrations/{registrationId}/wait:
+    post:
+      summary: Wait for the private Google claim to complete
+      description: Polls the registration server-side until it completes, expires, or the bounded timeout elapses. On timeout the response stays resumable with state=user_action_required; call again to continue waiting.
+      security:
+        - bearerAuth: [registrations:read]
+      parameters:
+        - $ref: '#/components/parameters/RegistrationId'
+        - $ref: '#/components/parameters/RequestId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegistrationWaitRequest'
+      responses:
+        '200':
+          description: Final or still-pending registration state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegistrationResponse'
+        '401':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+  /v1/installations/{installationId}:
+    get:
+      summary: Read an owned installation
+      description: Returns status, allowed origins, entitlements, and linked stable IDs. Only installations provisioned by the calling agent client are readable; installations:manage clients may read any.
+      security:
+        - bearerAuth: [installations:read]
+      parameters:
+        - $ref: '#/components/parameters/InstallationId'
+      responses:
+        '200':
+          description: Installation state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstallationStatus'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+  /v1/installations/{installationId}/deactivate:
+    post:
+      summary: Disable an owned installation
+      description: The embed stops working until reactivated. Installation IDs stay stable; no re-embed is needed afterwards.
+      security:
+        - bearerAuth: [installations:read]
+      parameters:
+        - $ref: '#/components/parameters/InstallationId'
+        - $ref: '#/components/parameters/RequestId'
+      responses:
+        '200':
+          description: Disabled installation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstallationStatus'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+  /v1/installations/{installationId}/reactivate:
+    post:
+      summary: Re-enable a disabled installation
+      description: Restores an agent-disabled installation. Trial and subscription entitlements still gate embed access; this cannot resurrect an expired trial.
+      security:
+        - bearerAuth: [installations:read]
+      parameters:
+        - $ref: '#/components/parameters/InstallationId'
+        - $ref: '#/components/parameters/RequestId'
+      responses:
+        '200':
+          description: Re-enabled installation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstallationStatus'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+  /v1/installations/{installationId}/verify:
+    post:
+      summary: Verify an installed embed on a website
+      description: Runs per-check verification — installation state, origin binding, entitlements, an SSRF-guarded page fetch for the embed tag, and an optional runtime session smoke test when the embed key is supplied. Returns granular checks plus a machine-readable nextAction.
+      security:
+        - bearerAuth: [installations:read]
+      parameters:
+        - $ref: '#/components/parameters/InstallationId'
+        - $ref: '#/components/parameters/RequestId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyInstallationRequest'
+      responses:
+        '200':
+          description: Verification report
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifyInstallationResponse'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
   /v1/provisioning/workspaces:
     post:
       summary: Provision a provisional workspace and avatar
@@ -410,6 +549,8 @@ components:
       properties:
         registrationId: { type: string }
         status: { type: string, enum: [google_authorization_required, completed, expired] }
+        state: { type: string, enum: [user_action_required], description: Present while the private Google claim is outstanding. }
+        action: { type: string, enum: [google_claim], description: The human step required to finish provisioning. }
         authorizationUrl: { type: string, format: uri, nullable: true, description: Private URL returned only when a registration is started or its claim token is reissued; null on status reads. }
         claimUrl: { type: string, format: uri, description: One-time private URL returned only when a registration is started or its claim token is reissued. Never embed it in a webpage. }
         expiresAt: { type: integer }
@@ -424,8 +565,75 @@ components:
             embedKey: { type: string }
             scriptUrl: { type: string, format: uri }
             html: { type: string, description: Ready-to-paste script tag containing the real installation values. }
+            integration:
+              type: object
+              description: Machine-readable install recipe for coding agents.
+              properties:
+                type: { type: string, enum: [script] }
+                placement: { type: string, enum: [body] }
+                requires: { type: array, items: { type: string } }
+            verification:
+              type: object
+              properties:
+                recommendedPageUrl: { type: string, format: uri, description: Page the verify endpoint should fetch. }
           additionalProperties: true
         speech: { type: object, additionalProperties: true }
+    RegistrationWaitRequest:
+      type: object
+      properties:
+        timeoutSeconds: { type: integer, minimum: 1, maximum: 240, description: Max seconds to poll server-side (default 60). }
+    ClaimUrlResponse:
+      type: object
+      required: [registrationId, claimUrl]
+      properties:
+        registrationId: { type: string }
+        claimUrl: { type: string, format: uri, description: One-time private URL. Show only in the trusted agent conversation; never in webpages, source, logs, or git. }
+        expiresAt: { type: integer }
+    InstallationStatus:
+      type: object
+      required: [installationId, status]
+      properties:
+        installationId: { type: string }
+        workspaceId: { type: string }
+        avatarId: { type: string }
+        status: { type: string, enum: [active, disabled, expired] }
+        lifecycle: { type: string, enum: [provisional, claimed] }
+        allowedOrigins: { type: array, items: { type: string, format: uri } }
+        embedEnabled: { type: boolean }
+        speechMode: { type: string, enum: [mock, live] }
+        inactiveReason: { type: string, nullable: true }
+        expiresAt: { type: integer, nullable: true }
+    VerifyInstallationRequest:
+      type: object
+      properties:
+        embedKey: { type: string, description: Optional ek_... key; enables key-validity and runtime-session smoke checks. }
+        origin: { type: string, format: uri, description: Expected website origin; must match the installation's allowed origins when supplied. }
+        pageUrl: { type: string, format: uri, description: Page to fetch; defaults to the bound origin. }
+    VerifyInstallationResponse:
+      type: object
+      required: [verified, installationId, checks, nextAction]
+      properties:
+        verified: { type: boolean }
+        installationId: { type: string }
+        checks:
+          type: object
+          description: Each check reports true, false, or "skipped" when it could not run (e.g. private/localhost origins cannot be fetched server-side).
+          properties:
+            installationExists: { type: [boolean, string] }
+            installationOwned: { type: [boolean, string] }
+            installationActive: { type: [boolean, string] }
+            originAllowed: { type: [boolean, string] }
+            embedEntitled: { type: [boolean, string] }
+            pageReachable: { type: [boolean, string] }
+            embedScriptPresent: { type: [boolean, string] }
+            installationIdPresent: { type: [boolean, string] }
+            embedKeyValid: { type: [boolean, string] }
+            runtimeSessionCreated: { type: [boolean, string] }
+            runtimeSessionHealthy: { type: [boolean, string] }
+        nextAction:
+          type: string
+          enum: [install_embed, fix_installation_id, fix_embed_key, bind_origin, claim_required, owner_reactivation_required, reprovision, retry, none]
+        details: { type: object, additionalProperties: true }
     AvatarTemplate:
       type: object
       required: [templateId, name, runtimePresetId, capabilities, status]
@@ -434,6 +642,7 @@ components:
         name: { type: string }
         description: { type: string }
         thumbnailUrl: { type: string, format: uri }
+        previewImage: { type: string, format: uri, description: Image agents can show the user when presenting options. }
         avatarType: { type: string }
         previewUrl: { type: string, format: uri }
         runtimePresetId: { type: string }
@@ -441,6 +650,14 @@ components:
         capabilities:
           type: array
           items: { type: string }
+        voiceCapabilities:
+          type: array
+          items: { type: string }
+          description: Speech capabilities the template supports (e.g. mock, tts).
+        recommendedFor:
+          type: array
+          items: { type: string }
+          description: Agent-facing use-case hints for template selection.
         status: { type: string, enum: [active, hidden, retired] }
         currentVersion: { type: integer }
     ProvisionWorkspaceRequest:

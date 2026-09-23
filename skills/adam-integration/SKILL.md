@@ -24,15 +24,16 @@ Adam is an embeddable, remote-controllable real-time talking avatar. It can be c
 A working embed requires a real `installationId` and `ek_` embed key returned by a registration response; they cannot be hand-written. Installation, workspace, and avatar IDs are opaque strings with no fixed prefix — do not validate them by prefix. Never emit placeholder embed code — if the values do not exist yet, the provisioning workflow is the task.
 
 1. Clarify the use case: website embed, application control, agent provisioning, or MCP control.
-2. If the agent has no Adam credentials, register a minimally scoped dynamic client at `POST /v1/oauth/register`; keep the one-time secret only in the trusted agent environment.
-3. Obtain a token with `avatars:read`, `registrations:create`, and `registrations:read` for the hosted registration flow.
+2. If the agent has no Adam credentials, register a minimally scoped dynamic client at `POST /v1/oauth/register`; keep the one-time secret only in the trusted agent environment. MCP users can instead `initialize` an anonymous session — the server bootstraps credentials lazily on first privileged call.
+3. Obtain a token with `avatars:read`, `registrations:create`, `registrations:read`, and `installations:read` for the hosted registration flow.
 4. List templates and select one with the user.
 5. Start an origin-bound preview registration with a stable idempotency key.
-6. Install the returned preview embed, then show the private one-time `claimUrl` only in trusted chat or terminal. Never put it in browser code, public page text, logs, or git.
-7. Poll registration status after Google sign-in and preserve the returned `workspaceId`, `avatarId`, `installationId`, and registration identifiers.
-8. Explain that preview behavior is bounded and mock/canned; after claim, avatar rendering and speech follow trial/subscription entitlements.
-9. If a trial ends, explain that the public widget becomes inactive without a billing CTA and that the owner reactivates from the Adam account dashboard without re-embedding.
-10. Send speech through browser, REST, WebSocket, or MCP control.
+6. Install the returned preview embed — the `embed.integration` recipe says it is a `script` placed in `body` — then show the private one-time `claimUrl` only in trusted chat or terminal. Never put it in browser code, public page text, logs, or git.
+7. Wait for Google sign-in (`wait_for_claim` / `POST /v1/registrations/{id}/wait`) and preserve the returned `workspaceId`, `avatarId`, `installationId`, and registration identifiers.
+8. Verify the live install with `verify_installation` / `POST /v1/installations/{id}/verify` and act on `nextAction`.
+9. Explain that preview behavior is bounded and mock/canned; after claim, avatar rendering and speech follow trial/subscription entitlements.
+10. If a trial ends, explain that the public widget becomes inactive without a billing CTA and that the owner reactivates from the Adam account dashboard without re-embedding.
+11. Send speech through browser, REST, WebSocket, or MCP control.
 
 ## MCP server
 
@@ -42,10 +43,22 @@ The MCP endpoint is:
 POST https://adam-speaks.com/api/mcp
 ```
 
+It speaks standard MCP JSON-RPC (`initialize`, `tools/list`, `tools/call`, `DELETE` for session revoke) and also accepts `{ "name": "<tool>", "arguments": {} }`. `initialize` returns an anonymous `Mcp-Session-Id`; privileged calls lazily create a scoped dynamic client server-side, so the model never sees credentials.
+
 Important tools include:
 
 ```text
-list_avatar_templates
+list_avatar_templates          (public)
+start_google_registration      composite provisioning; never returns claimUrl
+get_claim_url                  sole source of the private claim URL
+get_registration_status        state=user_action_required while pending
+wait_for_claim                 bounded server-side wait
+get_registration_embed         embed + machine-readable install recipe
+get_installation               owned installation state
+get_runtime_status             embedEnabled / speechMode / inactiveReason
+verify_installation            granular checks + nextAction
+deactivate_installation        disable owned installation
+reactivate_installation        re-enable owned installation
 provision_avatar_for_project
 list_avatars
 get_avatar
@@ -56,10 +69,9 @@ interrupt_avatar_speech
 get_session_status
 get_claim_status
 resend_claim_email
-start_google_registration
-get_registration_status
-get_registration_embed
 ```
+
+Discovery: `GET /.well-known/adam-agent.json`, `/.well-known/oauth-protected-resource`, `/.well-known/oauth-authorization-server`.
 
 Use `docs/MCP.md` for required scopes, request shape, and the complete tool catalog.
 
