@@ -20,3 +20,5 @@ When the owner’s trial ends without an active subscription, the widget transit
 Installation keys are browser-visible, scoped capabilities. Do not place provider API keys, Firebase credentials, agent client secrets, owner IDs, claim tokens, or private configuration in the embed.
 
 A copied claimed or unclaimed embed fails to create a runtime session on an unauthorized origin. Any intentionally public static template assets remain non-account content, and the private out-of-band claim URL is never available through the embed.
+
+Avatar owners may use Character Studio to correct imported character UV layouts. These edits remain an owner-scoped avatar configuration overlay; they do not rewrite the original GLB/FBX source or require changes to the embed snippet.
