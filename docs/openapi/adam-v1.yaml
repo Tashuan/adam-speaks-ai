@@ -406,6 +406,117 @@ paths:
           $ref: '#/components/responses/Error'
         '429':
           $ref: '#/components/responses/Error'
+  /v1/runtime-sessions/{sessionId}:
+    get:
+      summary: Check a runtime session's status
+      description: Used by the hosted embed as a periodic entitlement/liveness check. Ended sessions report status `ended` or `revoked` with an `endedReason`.
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      responses:
+        '200':
+          description: Session status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sessionId: { type: string }
+                  installationId: { type: string }
+                  avatarId: { type: string }
+                  speechMode: { type: string, enum: [mock, live] }
+                  status: { type: string, enum: [active, ended, revoked, expired] }
+        '401':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+  /v1/runtime-sessions/{sessionId}/end:
+    post:
+      summary: End a runtime session
+      description: >-
+        Closes the session and records its duration. The hosted embed calls
+        this automatically via `navigator.sendBeacon` on page hide; beacons
+        cannot set headers, so the runtime token may be supplied as the
+        `runtimeToken` query parameter instead of the Authorization header.
+        Ending is idempotent — the first end call wins and later calls return
+        `alreadyEnded`.
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+        - name: runtimeToken
+          in: query
+          required: false
+          description: Runtime token fallback for sendBeacon/fetch-keepalive callers that cannot set headers.
+          schema: { type: string }
+      responses:
+        '200':
+          description: Session end record
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sessionId: { type: string }
+                  status: { type: string, enum: [ended, revoked] }
+                  endedReason: { type: string, enum: [client_end, revoked, swept] }
+                  endedAt: { type: integer, description: End timestamp in epoch milliseconds. }
+                  durationMs: { type: integer, nullable: true }
+                  alreadyEnded: { type: boolean }
+        '401':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+  /v1/workspaces/{workspaceId}/usage:
+    get:
+      summary: Read embed usage for a workspace
+      description: >-
+        Agent-scoped usage ledger: daily totals for runtime sessions, chat
+        messages/tokens, and speech requests/characters. Access is limited to
+        the agent that provisioned the workspace or agents holding the
+        `installations:manage` scope.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema: { type: string }
+        - name: days
+          in: query
+          required: false
+          description: Lookback window in days (1-400, default 30).
+          schema: { type: integer, minimum: 1, maximum: 400 }
+      responses:
+        '200':
+          description: Workspace usage
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  workspaceId: { type: string }
+                  days: { type: integer }
+                  totals:
+                    type: object
+                    description: Summed units across the window, plus a byAvatar breakdown.
+                    properties:
+                      session_starts: { type: integer }
+                      session_seconds: { type: integer }
+                      chat_messages: { type: integer }
+                      chat_tokens: { type: integer }
+                      speech_requests: { type: integer }
+                      speech_chars: { type: integer }
+                      byAvatar: { type: object, additionalProperties: { type: object, additionalProperties: { type: integer } } }
+                  daily:
+                    type: array
+                    description: One row per day with the same unit fields.
+                    items: { type: object, additionalProperties: true }
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
 components:
   securitySchemes:
     bearerAuth:
@@ -418,6 +529,11 @@ components:
       schema: { type: string }
     InstallationId:
       name: installationId
+      in: path
+      required: true
+      schema: { type: string }
+    SessionId:
+      name: sessionId
       in: path
       required: true
       schema: { type: string }
