@@ -69,6 +69,37 @@ paths:
           $ref: '#/components/responses/Error'
         '404':
           $ref: '#/components/responses/Error'
+    delete:
+      summary: Remove an owned account avatar
+      description: Permanently removes the avatar from the account and revokes all runtime access — installations and embed keys are deleted, active sessions are ended, and live embeds stop working. For template-provisioned avatars only the account copy is removed; the platform template remains available to others.
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/FirebaseAuth'
+        - $ref: '#/components/parameters/AvatarId'
+      responses:
+        '200':
+          description: Deletion result with per-resource removal counts
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok]
+                properties:
+                  ok:
+                    type: boolean
+                    description: True when every cleanup phase succeeded
+                  removed:
+                    type: object
+                    description: Counts of removed resources keyed by resource kind
+                  failures:
+                    type: array
+                    description: Phases that failed; the operation is safe to retry
+                    items:
+                      type: object
+        '401':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
   /v1/oauth/register:
     post:
       summary: Register a minimally scoped dynamic agent client

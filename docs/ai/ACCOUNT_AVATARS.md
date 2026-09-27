@@ -24,9 +24,10 @@ Stable identifiers remain unchanged through claim and later edits:
 These endpoints require a Firebase ID token from the signed-in Adam user:
 
 ```text
-GET   /api/v1/account/avatars
-GET   /api/v1/account/avatars/{avatarId}
-PATCH /api/v1/account/avatars/{avatarId}
+GET    /api/v1/account/avatars
+GET    /api/v1/account/avatars/{avatarId}
+PATCH  /api/v1/account/avatars/{avatarId}
+DELETE /api/v1/account/avatars/{avatarId}
 ```
 
 The API verifies the token, checks that the avatar belongs to the authenticated user, and returns the public avatar state:
@@ -43,6 +44,8 @@ The API verifies the token, checks that the avatar belongs to the authenticated 
 - Inactive reason when a trial/subscription has ended
 
 The update endpoint accepts only avatar presentation/behavior fields and `allowedOrigins`. It does not allow changing ownership, workspace identity, avatar identity, installation identity, or entitlement state from the browser.
+
+The delete endpoint permanently removes the avatar from the account. It deletes the installation and embed keys, ends any active sessions, and clears the public showcase pointer when set — live embeds for that avatar stop working immediately. For avatars provisioned from a platform template, only the account copy is removed; the template itself remains available to other users. The response reports per-resource removal counts and any failed cleanup phases, and the operation is safe to retry.
 
 ## Agent/user handoff
 
