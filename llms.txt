@@ -28,5 +28,7 @@ When asked to add Adam, connect to the MCP server (`initialize` needs no credent
 
 Preview behavior is bounded and mock/canned. Trial and subscription entitlements control production runtime access. Live speech also requires the owner's own ElevenLabs API key, added in the Adam dashboard under the avatar's Admin → AI settings → TTS API keys — speech stays in mock mode until an active subscription and key are both in place, and agents should direct users there after claim. When a trial ends without an active subscription, the public widget becomes inactive without a billing CTA; the owner reactivates from the authenticated Adam account without re-embedding.
 
+The same embed snippet can render a chat widget (floating launcher or inline chat bar around the avatar) when the owner enables it in Admin Console → Chat Widget. Chat requires a claimed avatar with an active subscription and the owner's BYOK provider key; provisional avatars render the avatar only. `data-widget-mode="floating|inline"` overrides the presentation on a page; `verify_installation` reports a `chatWidget` block, and `AdamAvatar.chat.send(text)` is the programmatic surface.
+
 ## Security
 Provider credentials and agent secrets remain server-side. Claim URLs are one-time private handoff credentials. Installation keys are scoped browser capabilities, exact origins are enforced, and runtime tokens are short-lived and scoped to one installation, avatar, and session.

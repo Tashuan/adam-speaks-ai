@@ -12,7 +12,7 @@ function output(value, options) {
 }
 
 function help() {
-  console.log(`Adam CLI\n\nUsage:\n  adam <command> [options]\n\nCommands:\n  doctor                         Check API and local configuration\n  avatar templates               List available avatar templates\n  agent register                 Register a temporary agent client\n  registration start             Start hosted Google registration\n  registration status <id>       Read registration status\n  registration wait <id>         Wait for registration completion\n  registration embed <id>        Get the completed registration embed\n  embed generate                 Generate an installation embed\n\nCommon options:\n  --api-url <url>                Override the API base URL\n  --format json                  Return machine-readable JSON\n\nAgent credentials:\n  ADAM_AGENT_CLIENT_ID\n  ADAM_AGENT_CLIENT_SECRET\n`);
+  console.log(`Adam CLI\n\nUsage:\n  adam <command> [options]\n\nCommands:\n  doctor                         Check API and local configuration\n  avatar templates               List available avatar templates\n  agent register                 Register a temporary agent client\n  registration start             Start hosted Google registration\n  registration status <id>       Read registration status\n  registration wait <id>         Wait for registration completion\n  registration embed <id>        Get the completed registration embed\n  embed generate                 Generate an installation embed\n                                 (--mode floating|inline forces the chat widget chrome;\n                                 the avatar's widget config decides the default)\n\nCommon options:\n  --api-url <url>                Override the API base URL\n  --format json                  Return machine-readable JSON\n\nAgent credentials:\n  ADAM_AGENT_CLIENT_ID\n  ADAM_AGENT_CLIENT_SECRET\n`);
 }
 
 function client(options) {
@@ -93,8 +93,17 @@ async function run(argv) {
     const installationId = required(options, 'installation');
     const key = required(options, 'key');
     const script = options.script || '/assets/avatar-widget/ai-first-embed.js';
-    const html = `<script src="${script}" data-installation-id="${installationId}" data-embed-key="${key}"></script>`;
-    return output({ installationId, html }, options);
+    const mode = options.mode;
+    if (mode !== undefined && !['floating', 'inline'].includes(mode)) {
+      throw new Error('--mode must be floating or inline.');
+    }
+    const modeAttr = mode ? ` data-widget-mode="${mode}"` : '';
+    const html = `<script src="${script}" data-installation-id="${installationId}" data-embed-key="${key}"${modeAttr}></script>`;
+    return output({
+      installationId,
+      html,
+      chatWidget: 'The same snippet renders the chat widget when the avatar has widget.enabled set and the owner has an active subscription plus a BYOK provider key. Unclaimed/provisional avatars render the avatar only.',
+    }, options);
   }
 
   throw new Error(`Unknown command: ${positionals.join(' ')}`);

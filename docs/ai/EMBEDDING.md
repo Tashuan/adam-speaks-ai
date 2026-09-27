@@ -22,3 +22,20 @@ Installation keys are browser-visible, scoped capabilities. Do not place provide
 A copied claimed or unclaimed embed fails to create a runtime session on an unauthorized origin. Any intentionally public static template assets remain non-account content, and the private out-of-band claim URL is never available through the embed.
 
 Avatar owners may use Character Studio to correct imported character UV layouts. These edits remain an owner-scoped avatar configuration overlay; they do not rewrite the original GLB/FBX source or require changes to the embed snippet.
+
+## Chat widget
+
+The same script snippet can render a chat widget — the avatar iframe plus a host-page chat chrome (an inline chat bar under the avatar, or a floating launcher bubble that expands into a panel). The widget is a feature of the embed, not a separate product: same `installationId`, same `ek_...` key, same origin enforcement.
+
+The owner enables and configures it in the Adam Admin Console → Chat Widget page (display mode, theme, position, welcome message, and the chat scenario — provider, model, system prompt). To force a presentation mode for one page, add `data-widget-mode="floating"` or `data-widget-mode="inline"`; when omitted, the avatar's configured mode wins.
+
+Chat requirements:
+
+- The avatar must be **claimed** with an **active subscription**. Unclaimed/provisional preview installations render the avatar only — no chat UI.
+- The owner must configure their own AI provider key (BYOK) in Admin → AI → Providers. No platform fallback is used; without a key the widget shows a polite "chat isn't configured" message.
+- Visitor messages go through `POST /v1/runtime-sessions/{sessionId}/chat` authorized by the short-lived runtime token. Replies are generated server-side and spoken through the same session speech path.
+- The chat scenario (system prompt, provider, model) never leaves the server; session responses carry only presentation fields.
+
+Owners see the full transcript for widget sessions in Connect, and can take over a conversation or interject manually — something plain embeds cannot offer because integrators run their own LLM/TTS loop there.
+
+For programmatic use, `window.AdamAvatar.chat.send(text)` sends a message, `AdamAvatar.chat.enabled` reports whether chat is live, and `adam:chat.message` DOM events fire per turn.

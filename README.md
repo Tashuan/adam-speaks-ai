@@ -73,6 +73,8 @@ The browser exchanges the key for a short-lived runtime session. The separate on
 
 A copied claimed or unclaimed embed is rejected for runtime access on an unauthorized origin. Preview behavior is bounded mock behavior and does not expose account data or claim authority.
 
+The same snippet can render an optional **chat widget** — an inline chat bar or floating launcher bubble around the avatar — when the owner enables it in the Admin Console. Chat requires a claimed avatar with an active subscription and the owner's own AI provider key; see [`docs/ai/EMBEDDING.md`](docs/ai/EMBEDDING.md).
+
 ## Remote control
 
 Adam can receive speech and control events from:

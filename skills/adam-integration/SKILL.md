@@ -56,8 +56,8 @@ get_registration_status        state=user_action_required while pending
 wait_for_claim                 bounded server-side wait
 get_registration_embed         embed + machine-readable install recipe
 get_installation               owned installation state
-get_runtime_status             embedEnabled / speechMode / inactiveReason
-verify_installation            granular checks + nextAction
+get_runtime_status             embedEnabled / chatEnabled / speechMode / inactiveReason
+verify_installation            granular checks + nextAction + chatWidget block
 deactivate_installation        disable owned installation
 reactivate_installation        re-enable owned installation
 provision_avatar_for_project
@@ -116,6 +116,10 @@ Use only installation details returned by a registration response or a trusted b
 ```
 
 The private `claimUrl` is not part of the snippet. Show it only in the trusted agent/user channel.
+
+### Chat widget
+
+The same snippet renders the chat widget when the avatar's owner has enabled it in Admin Console → Chat Widget — a floating launcher bubble or inline chat bar around the same avatar iframe. Add `data-widget-mode="floating"` or `"inline"` to force the presentation for one page. Chat requires a claimed avatar with an active subscription and an owner-configured BYOK provider key (Admin → AI → Providers); provisional/preview avatars render the avatar only. There is no `configure_widget` MCP tool — scenario setup is an owner action. Widget sessions give the owner the full transcript plus live monitoring/operator takeover in Connect, which plain embeds (integrator-owned LLM loop) cannot offer.
 
 ## Security rules
 

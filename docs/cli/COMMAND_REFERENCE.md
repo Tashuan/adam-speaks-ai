@@ -60,7 +60,9 @@ adam registration wait REGISTRATION_ID [--timeout SECONDS]
 Generates an HTML installation snippet. Installation keys are treated as browser-visible capabilities, not account credentials.
 
 ```bash
-adam embed generate --installation INSTALLATION_ID --key EMBED_KEY
+adam embed generate --installation INSTALLATION_ID --key EMBED_KEY [--mode floating|inline]
 ```
+
+`--mode` adds a `data-widget-mode` attribute that forces the chat widget chrome (floating launcher or inline chat bar). When omitted, the avatar's configured widget mode wins; avatars without a configured widget render the plain avatar either way. Chat additionally requires a claimed avatar with an active subscription and an owner-configured BYOK provider key — the CLI only emits the snippet.
 
 The CLI does not deploy, revoke, delete, or rotate production resources implicitly.

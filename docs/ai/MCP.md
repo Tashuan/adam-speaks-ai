@@ -28,15 +28,15 @@ get_registration_status      includes state=user_action_required / action=google
 wait_for_claim               bounded server-side wait for Google claim completion
 get_registration_embed       embed snippet + machine-readable install recipe
 get_installation             owned installation state, origins, entitlements
-get_runtime_status           embedEnabled / speechMode / inactiveReason
-verify_installation          granular checks + nextAction
+get_runtime_status           embedEnabled / chatEnabled / speechMode / inactiveReason
+verify_installation          granular checks + nextAction + chatWidget capability block
 deactivate_installation      disable an owned installation (stable IDs preserved)
 reactivate_installation      re-enable an agent-disabled installation
 provision_avatar_for_project direct provisioning (configured clients only)
 list_avatars                 list avatars in a workspace
 get_avatar                   read an avatar
 create_avatar_session        create a runtime session
-get_embed_code               script snippet + install recipe
+get_embed_code               script snippet + install recipe (+ optional widgetMode, chatWidget status)
 send_avatar_speech           send text to a session
 interrupt_avatar_speech      interrupt current speech
 get_session_status           session state
@@ -55,5 +55,15 @@ resend_claim_email           resend the handoff email
 - `GET /.well-known/adam-agent.json` — Adam manifest (endpoints, capabilities, auth modes)
 - `GET /.well-known/oauth-protected-resource` — RFC 9728 resource metadata
 - `GET /.well-known/oauth-authorization-server` — RFC 8414 server metadata
+
+## Chat widget
+
+The chat widget is a presentation layer on the same installation embed — no separate identity or snippet. It is configured by the avatar owner in the Admin Console (there is deliberately no `configure_widget` tool: changing someone's chat persona needs an owner action, not an agent scope). Agents can:
+
+- pass `widgetMode` (`floating`/`inline`) to `get_embed_code` to emit a `data-widget-mode` override,
+- read `chatEnabled` in `get_installation`/`get_runtime_status` entitlements,
+- read the `chatWidget` block in `verify_installation` results to confirm whether the avatar has a widget configured before promising chat on a page.
+
+Chat requires a claimed avatar with an active subscription and an owner-configured BYOK provider key; provisional installations are avatar-only.
 
 Use MCP for discovery and agent control. Use browser, REST, or WebSocket speech when the application itself needs runtime delivery.
