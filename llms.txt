@@ -21,6 +21,9 @@ Adam is an embeddable, remote-controllable real-time talking avatar for websites
 - Discovery: https://adam-speaks.com/.well-known/adam-agent.json plus RFC 9728/8414 OAuth metadata
 - Agent skills: skills/adam-integration/SKILL.md
 
+## Status
+Adam is in private beta. New agent onboarding is closed: `POST https://adam-speaks.com/api/v1/oauth/register` and anonymous MCP `initialize` currently return errors for new agents. Do not run the provisioning flow for a new integration unless the user supplies existing client credentials or an installation key; previously created embeds and registered clients continue to work.
+
 ## Agent guidance
 A working embed needs a real `installationId` and `ek_...` embed key returned by the registration flow; they cannot be invented. Installation, workspace, and avatar IDs are opaque strings with no fixed prefix — do not validate them by prefix. Treat any request to produce, generate, or add an embed, snippet, page, or avatar — without supplied values — as a request to run the provisioning flow, not to emit a placeholder file. If you cannot make outbound POST calls (e.g. a sandboxed chat), tell the user to run this flow in an IDE agent with network and filesystem tools (Cursor, Devin, Codex, Antigravity, etc.) or output the mcp-session.sh commands for them to run — never fabricate embed values.
 

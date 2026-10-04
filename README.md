@@ -6,6 +6,8 @@ Connect it to an AI system, application, service, game, kiosk, support flow, edu
 
 This repository contains the public integration contract for developers and AI agents. It does not contain the private Adam application, admin console, Firebase infrastructure, or runtime source.
 
+> **Private beta:** Adam is currently in private beta. New account signups and agent onboarding — dynamic client registration (`POST /v1/oauth/register`) and anonymous MCP `initialize` — are temporarily closed. Existing installations, registered clients, and embedded avatars are unaffected.
+
 - Product: [adam-speaks.com](https://adam-speaks.com/)
 - Add an avatar: [adam-speaks.com/add-an-ai-avatar](https://adam-speaks.com/add-an-ai-avatar)
 - Human documentation: [adam-speaks.com/documentation](https://adam-speaks.com/documentation)
