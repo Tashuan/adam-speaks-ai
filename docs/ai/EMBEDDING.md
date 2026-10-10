@@ -2,6 +2,17 @@
 
 An agent-created Adam embed starts as an origin-bound preview and becomes a production installation after the user completes the private claim handoff.
 
+## Avatar states
+
+| State | Renders | Speech | What the user does next |
+| --- | --- | --- | --- |
+| Unclaimed preview | yes, bounded | mock | click claim link → Google sign-in |
+| Claimed | yes | mock | subscription/trial + ElevenLabs key in dashboard |
+| Live | yes | live | nothing |
+| Trial expired | inactive placeholder | — | reactivate in dashboard, no re-embed |
+
+The embed rendering is not proof the setup is complete — unclaimed previews render. `verify_installation`'s `nextAction` walks the remaining owner steps (`claim_required` → `subscription` → `tts_key` → `none`) and the registration/`verify` responses carry `ownerActionRequired`/`ownerInstructions` describing the current step.
+
 The `installationId` and `ek_...` embed key values below come from the registration flow in [the quickstart](./QUICKSTART.md) and cannot be hand-written. Installation IDs are opaque strings with no fixed prefix. If you are producing this page for a user and do not have real values, run the provisioning flow first — a placeholder page cannot create a runtime session. If you cannot call the API yourself, ask the user for the exact website origin and template choice and give them the commands to run.
 
 ```html

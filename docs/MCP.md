@@ -37,7 +37,7 @@ The server speaks the MCP JSON-RPC protocol over Streamable HTTP with JSON respo
 | `create_avatar_session` | Create a short-lived runtime session | `installations:create` |
 | `get_embed_code` | Script snippet + install recipe | `installations:create` |
 | `send_avatar_speech` | Send text to an active session | `speech:send` |
-| `send_avatar_command` | Scene command to a connected embed (camera, background, lights, look-at, parallax, animation, expression, interrupt) | `avatars:command` |
+| `send_avatar_command` | Scene command to a connected embed (camera, background, lights, look-at, parallax, animation, expression, interrupt). Targets `sessionId`, or `installationId` for the installation's most recent live session. | `avatars:command` |
 | `interrupt_avatar_speech` | Interrupt current speech | `speech:interrupt` |
 | `get_session_status` | Inspect runtime session state | `avatars:read` |
 | `get_claim_status` | Read ownership handoff state | `avatars:read` |

@@ -14,10 +14,24 @@ Connect to `https://adam-speaks.com/api/mcp` (see `/.well-known/adam-agent.json`
 4. Install the returned embed using your own filesystem/GitHub tools, or hand the snippet to the user. The embed's `integration` block (`type: "script"`, `placement: "body"`) tells you where it goes.
 5. `get_claim_url` — the only tool that returns the private one-time claim URL. Show it to the user in this conversation only; never put it in page source, files, logs, or git.
 6. `wait_for_claim` — waits server-side; a timeout returns a resumable `user_action_required` state, so call it again until `status` is `completed`.
-7. `verify_installation` — pass `installationId`, `origin`, and `embedKey` to check the live page, key validity, and a runtime session smoke test; act on `nextAction`.
+7. `verify_installation` — pass `installationId`, `origin`, and `embedKey` to check the live page, key validity, and a runtime session smoke test; act on `nextAction`. A passing embed can still report outstanding owner steps: `claim_required` → `subscription` → `tts_key` → `none`, mirrored in `ownerActionRequired`/`ownerInstructions`.
 8. Explain that preview speech is mock/canned, claimed avatars follow trial/subscription entitlements, and an expired trial produces an inactive public widget state with no billing CTA.
 9. To unlock live speech, tell the user both requirements: an active Adam subscription, and their own ElevenLabs API key saved in the Adam dashboard (avatar Admin Console → AI settings → TTS API keys; keys come from `https://elevenlabs.io/app/settings/api-keys`). Speech stays `mode: "mock"` until both are in place. Templates never carry a provider key; every owner supplies their own.
 10. If the avatar becomes inactive, direct the user to log in to Adam and reactivate it from the account/billing dashboard; do not change the embed IDs. `deactivate_installation`/`reactivate_installation` manage agent-disabled state only.
+
+## Repeat the pending action (standing rule)
+
+A rendering avatar is NOT a finished setup — the embed works before claim, so "it works" looks like "it's done." While any response reports `state: "user_action_required"`, `nextAction`/`ownerActionRequired` other than `none`, or a pending claim, restate the outstanding action — with the claim URL when claim is the step — in **every** message to the user until the status flips. Never let a final message end without the pending action visible.
+
+## Completion report (required final output)
+
+When the flow ends — success or handoff — print this checklist verbatim, filling each line:
+
+- **Ownership:** registration `completed` — or the claim URL re-shown above if still pending
+- **Speech:** stays mock until BOTH an active subscription AND the owner's own ElevenLabs key (Admin Console → AI settings → TTS API keys)
+- **Manage:** adam-speaks.com dashboard — reactivation, TTS keys, chat widget. Never re-embed for these.
+- **Saved IDs:** workspaceId / avatarId / installationId
+- **Origin:** embed only works on the exact registered origin — a new domain means a new registration
 
 ## REST flow (self-managed credentials)
 

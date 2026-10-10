@@ -15,6 +15,7 @@ Adam is an embeddable, remote-controllable real-time talking avatar for websites
 - Quickstart: docs/ai/QUICKSTART.md
 - Claim and activation: docs/ai/CLAIM_AND_ACTIVATION.md
 - Embedding: docs/ai/EMBEDDING.md
+- Embed customization: docs/ai/EMBED_CUSTOMIZATION.md
 - Authentication: docs/ai/AUTHENTICATION.md
 - OpenAPI: docs/openapi/adam-v1.yaml
 - MCP server: docs/MCP.md (POST https://adam-speaks.com/api/mcp — anonymous initialize sessions, lazy credential bootstrap)
@@ -22,12 +23,14 @@ Adam is an embeddable, remote-controllable real-time talking avatar for websites
 - Agent skills: skills/adam-integration/SKILL.md
 
 ## Status
-Adam is in private beta. New agent onboarding is closed: `POST https://adam-speaks.com/api/v1/oauth/register` and anonymous MCP `initialize` currently return errors for new agents. Do not run the provisioning flow for a new integration unless the user supplies existing client credentials or an installation key; previously created embeds and registered clients continue to work.
+Onboarding state is machine-readable and may change over time — check `onboarding.open` in `https://adam-speaks.com/.well-known/adam-agent.json` before running the provisioning flow. When `open` is true, new agents may register (`POST /api/v1/oauth/register`) and start anonymous MCP sessions. When `open` is false, only new client registration is gated — previously created embeds, registered clients, and their claim flows continue to work; retry later rather than assuming the flow is broken.
 
 ## Agent guidance
 A working embed needs a real `installationId` and `ek_...` embed key returned by the registration flow; they cannot be invented. Installation, workspace, and avatar IDs are opaque strings with no fixed prefix — do not validate them by prefix. Treat any request to produce, generate, or add an embed, snippet, page, or avatar — without supplied values — as a request to run the provisioning flow, not to emit a placeholder file. If you cannot make outbound POST calls (e.g. a sandboxed chat), tell the user to run this flow in an IDE agent with network and filesystem tools (Cursor, Devin, Codex, Antigravity, etc.) or output the mcp-session.sh commands for them to run — never fabricate embed values.
 
 When asked to add Adam, connect to the MCP server (`initialize` needs no credentials — privileged calls lazily bootstrap a scoped client server-side) or bootstrap a minimally scoped dynamic client over REST. Choose a template and exact website origin, and start a registration with a stable idempotency key. Install the returned origin-bound preview embed using your own filesystem/GitHub tools, or hand the snippet to the user. Show the one-time private `claimUrl` (from `get_claim_url` on MCP) only in the trusted agent/user conversation; never place it in the webpage, source code, logs, or git. Wait for Google sign-in with `wait_for_claim`, then confirm the live embed with `verify_installation` and preserve the stable workspace, avatar, and installation IDs.
+
+The embed renders before claim — a working avatar is not a finished setup. While any response reports `state: "user_action_required"` or a `nextAction`/`ownerActionRequired` other than `none`, restate the outstanding action (with the claim URL when claim is the step) in every user message until it flips. `verify_installation`'s owner chain is `claim_required` → `subscription` → `tts_key` → `none`; `ownerInstructions` carries the verbatim message for each step.
 
 Preview behavior is bounded and mock/canned. Trial and subscription entitlements control production runtime access. Live speech also requires the owner's own ElevenLabs API key, added in the Adam dashboard under the avatar's Admin → AI settings → TTS API keys — speech stays in mock mode until an active subscription and key are both in place, and agents should direct users there after claim. When a trial ends without an active subscription, the public widget becomes inactive without a billing CTA; the owner reactivates from the authenticated Adam account without re-embedding.
 

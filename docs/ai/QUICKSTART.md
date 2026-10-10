@@ -108,9 +108,24 @@ Retry safety uses the body `idempotencyKey`; the optional `X-Request-ID` header 
 
 ## 3. Complete ownership
 
+### ⚠ The embed is NOT done until the user claims it
+
+The avatar renders immediately in bounded preview mode — this looks finished but is not. Until the user completes the Google claim, the avatar is unowned, speech is mock-only, and the registration expires in 7 days.
+
+You MUST show the user this message verbatim and end your turn on it:
+
+> **Action required — claim your avatar**
+> Open this private link and sign in with Google:
+> {claimUrl}
+>
+> Use a normal browser window (Chrome recommended — embedded previews and private windows break the Google popup).
+> One-time link, valid 7 days. Tell me when you're done so I can verify.
+
+Then poll until registration status is `completed`. Do not report success before that.
+
 The user opens the private URL and clicks the Google sign-in button. Adam verifies the Firebase identity, attaches the existing preview workspace/avatar/installation to that account, and starts or recognizes the account trial.
 
-Poll `GET /v1/registrations/{registrationId}` with the agent token until `status` is `completed`, or call `POST /v1/registrations/{registrationId}/wait` with `{ "timeoutSeconds": 120 }` to wait server-side (MCP: `wait_for_claim`). The status moves from `google_authorization_required` to `completed`, or `expired` once `expiresAt` passes (7 days). While pending, responses carry `state: "user_action_required"`, `action: "google_claim"`. The completed response omits `claimUrl` and sets `authorizationUrl` to `null`. `workspaceId`, `avatarId`, and `installationId` remain stable.
+Poll `GET /v1/registrations/{registrationId}` with the agent token until `status` is `completed`, or call `POST /v1/registrations/{registrationId}/wait` with `{ "timeoutSeconds": 120 }` to wait server-side (MCP: `wait_for_claim`). The status moves from `google_authorization_required` to `completed`, or `expired` once `expiresAt` passes (7 days). While pending, responses carry `state: "user_action_required"`, `action: "google_claim"` plus `ownerActionRequired`/`ownerInstructions`. The completed response omits `claimUrl` and sets `authorizationUrl` to `null`. `workspaceId`, `avatarId`, and `installationId` remain stable.
 
 If the user needs the link again, `POST /v1/registrations/{registrationId}/claim-url` (MCP: `get_claim_url`) mints a fresh one-time URL for the pending registration.
 

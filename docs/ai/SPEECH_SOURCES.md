@@ -51,6 +51,20 @@ Content-Type: application/json
 
 `200` → `{ "sessionId", "commandId", "command", "status": "queued" }`. `409 SESSION_STALE` (retryable) when the embed iframe isn't connected. The MCP equivalent is `send_avatar_command` (`avatars:command` scope).
 
+### Agent-token variant — `POST /v1/installations/{installationId}/command`
+
+The `runtimeToken` only exists inside the embedded browser, so an agent that provisioned an installation cannot call the session-scoped endpoint directly. The installation-scoped variant accepts the **agent bearer token** (`avatars:command` scope) and targets the installation's most recent live embed session — same request body, same response, same whitelist:
+
+```http
+POST /v1/installations/{installationId}/command
+Authorization: Bearer <agentToken>
+Content-Type: application/json
+
+{ "command": "speak", "payload": { "cameraPos": { "x": 0, "y": 1.5, "z": 2.2 } } }
+```
+
+Returns `409 SESSION_STALE` when no live embed session exists for the installation — open the embedded page, then retry. The agent must own the installation (it is bound at provisioning); `installations:manage` clients may target any installation.
+
 ### Command types
 
 | `command` | `payload` |
@@ -80,4 +94,4 @@ All fields are optional; send any subset. Unknown fields are dropped server-side
 
 - The runtime token and session id are the same credentials the embed uses for `/speech`; commands are additionally gated on the avatar iframe's live connection, so a stolen token cannot queue commands onto a closed session.
 - Payloads pass a strict whitelist — anything outside the contract is dropped before delivery.
-- Rate limits: 120 commands/minute per session, 300/minute per caller.
+- Rate limits: 120 commands/minute per session, 300/minute per caller. Speech is metered per session (60/min) and per installation (120/min) — a leaked embed key cannot drain the owner's TTS quota.

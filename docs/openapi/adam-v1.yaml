@@ -155,6 +155,37 @@ paths:
       responses:
         '200':
           description: One-time authorization code and registered redirect URI
+  /v1/oauth/revoke:
+    post:
+      summary: Revoke a dynamically registered agent client
+      description: >-
+        RFC 7009-style self-service revocation: authenticate with the client
+        credentials — no bearer token required. Stops all new token issuance
+        (`AGENT_CLIENT_REVOKED`); already-issued tokens remain valid until
+        their one-hour expiry. Statically provisioned clients cannot be
+        revoked through this endpoint.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [client_id, client_secret]
+              properties:
+                client_id: { type: string }
+                client_secret: { type: string }
+      responses:
+        '200':
+          description: Revocation result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  client_id: { type: string }
+                  status: { type: string, enum: [revoked] }
+        '401':
+          $ref: '#/components/responses/Error'
   /v1/avatar-templates:
     get:
       summary: List active avatar templates
@@ -436,6 +467,49 @@ paths:
         '403':
           $ref: '#/components/responses/Error'
         '429':
+          $ref: '#/components/responses/Error'
+  /v1/installations/{installationId}/command:
+    post:
+      summary: Send a scene command to the installation's live embed session
+      description: >-
+        Agent-token variant of `POST /v1/runtime-sessions/{sessionId}/command`.
+        The runtime token only exists inside the embedded browser, so this
+        endpoint resolves the installation's most recent active runtime
+        session and delivers the same whitelisted command through the same
+        sanitized path. Requires the `avatars:command` scope (or
+        `installations:manage`) and ownership of the installation.
+        Returns `409 SESSION_STALE` (retryable) when no live embed session
+        exists — open the embedded page, then retry.
+      security:
+        - bearerAuth: [avatars:command]
+      parameters:
+        - $ref: '#/components/parameters/InstallationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RuntimeCommandRequest'
+      responses:
+        '200':
+          description: Queued command
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RuntimeCommandResponse'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '503':
           $ref: '#/components/responses/Error'
   /v1/runtime-sessions/{sessionId}:
     get:
@@ -766,6 +840,8 @@ components:
         status: { type: string, enum: [google_authorization_required, completed, expired] }
         state: { type: string, enum: [user_action_required], description: Present while the private Google claim is outstanding. }
         action: { type: string, enum: [google_claim], description: The human step required to finish provisioning. }
+        ownerActionRequired: { type: string, enum: [claim, subscription, tts_key, none], description: The owner's current outstanding step. 'claim' while the Google claim is pending; 'none' otherwise. The embed renders before claim — a working page is not a finished setup until this reads 'none'. }
+        ownerInstructions: { type: string, description: Human-readable instructions for the outstanding owner step; show to the user verbatim. }
         authorizationUrl: { type: string, format: uri, nullable: true, description: Private URL returned only when a registration is started or its claim token is reissued; null on status reads. }
         claimUrl: { type: string, format: uri, description: One-time private URL returned only when a registration is started or its claim token is reissued. Never embed it in a webpage. }
         expiresAt: { type: integer }
@@ -847,8 +923,14 @@ components:
             runtimeSessionHealthy: { type: [boolean, string] }
         nextAction:
           type: string
-          enum: [install_embed, fix_installation_id, fix_embed_key, bind_origin, claim_required, owner_reactivation_required, reprovision, retry, none]
-        details: { type: object, additionalProperties: true }
+          enum: [install_embed, fix_installation_id, fix_embed_key, bind_origin, claim_required, subscription, tts_key, owner_reactivation_required, reprovision, retry, none]
+          description: >-
+            Next machine-actionable or owner step. A passing embed can still
+            carry outstanding owner steps — the chain is claim_required →
+            subscription → tts_key → none. verified is true only at 'none'.
+        ownerActionRequired: { type: string, enum: [claim, subscription, tts_key, none], description: Mirror of the owner step in nextAction; repeat it to the user until 'none'. }
+        ownerInstructions: { type: string, description: Human-readable instructions for the outstanding owner step; show to the user verbatim. }
+        details: { type: object, additionalProperties: true, description: 'May include lifecycle, speechMode, providerConfigured, chatWidget, inactiveReason, or error context.' }
     AvatarTemplate:
       type: object
       required: [templateId, name, runtimePresetId, capabilities, status]

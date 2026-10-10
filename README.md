@@ -6,7 +6,7 @@ Connect it to an AI system, application, service, game, kiosk, support flow, edu
 
 This repository contains the public integration contract for developers and AI agents. It does not contain the private Adam application, admin console, Firebase infrastructure, or runtime source.
 
-> **Private beta:** Adam is currently in private beta. New account signups and agent onboarding — dynamic client registration (`POST /v1/oauth/register`) and anonymous MCP `initialize` — are temporarily closed. Existing installations, registered clients, and embedded avatars are unaffected.
+> **Onboarding state:** new account signups and agent onboarding — dynamic client registration (`POST /v1/oauth/register`) and anonymous MCP `initialize` — follow the live `onboarding.open` flag in the [agent manifest](https://adam-speaks.com/.well-known/adam-agent.json). When `open` is false, existing installations, registered clients, and embedded avatars keep working; check the flag rather than assuming the flow is broken.
 
 - Product: [adam-speaks.com](https://adam-speaks.com/)
 - Add an avatar: [adam-speaks.com/add-an-ai-avatar](https://adam-speaks.com/add-an-ai-avatar)
@@ -49,6 +49,7 @@ If you are the agent reading this: the prompt above is a request to run the flow
 | You want to… | Read |
 | --- | --- |
 | Add an avatar to a website or application | [`docs/ai/EMBEDDING.md`](docs/ai/EMBEDDING.md) |
+| Customize the embed's size, mode, or JS API | [`docs/ai/EMBED_CUSTOMIZATION.md`](docs/ai/EMBED_CUSTOMIZATION.md) |
 | Control an avatar from an application or service | [`docs/ai/SPEECH_SOURCES.md`](docs/ai/SPEECH_SOURCES.md) |
 | Provision an avatar for a user | [`docs/ai/PROVISIONING.md`](docs/ai/PROVISIONING.md) |
 | Let an AI agent discover and control Adam | [`docs/MCP.md`](docs/MCP.md) |
