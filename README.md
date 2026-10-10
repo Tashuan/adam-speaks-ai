@@ -54,6 +54,7 @@ If you are the agent reading this: the prompt above is a request to run the flow
 | Let an AI agent discover and control Adam | [`docs/MCP.md`](docs/MCP.md) |
 | Automate onboarding from a terminal | [`docs/CLI.md`](docs/CLI.md) |
 | Understand authentication and ownership | [`docs/ai/AUTHENTICATION.md`](docs/ai/AUTHENTICATION.md) |
+| Run and customize an avatar in the console | [`docs/console/`](docs/console/) |
 
 Start with [`docs/INTEGRATION.md`](docs/INTEGRATION.md) for the shortest decision guide or [`docs/ai/QUICKSTART.md`](docs/ai/QUICKSTART.md) for the complete provisioning flow.
 
@@ -139,6 +140,7 @@ Preview behavior is bounded and mock/canned. After claim, avatar rendering and s
 - [`skills/`](skills/) — canonical and platform-specific agent skills
 - [`docs/openapi/`](docs/openapi/) — machine-readable API definition
 - [`docs/security/`](docs/security/) — authorization, installation keys, and credential isolation
+- [`docs/console/`](docs/console/) — owner-facing Admin Console guides (scene, outfits, voice, animations, sharing, connect, video producer)
 - [`examples/`](examples/) — minimal integration snippets
 
 ## Security principles

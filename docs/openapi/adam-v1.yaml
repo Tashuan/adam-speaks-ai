@@ -497,6 +497,35 @@ paths:
           $ref: '#/components/responses/Error'
         '404':
           $ref: '#/components/responses/Error'
+  /v1/share/{configId}/widget:
+    get:
+      summary: Public share-page widget config
+      description: >-
+        Unauthenticated lookup used by Adam-hosted share pages. Returns the
+        share-chat capability for the avatar bound to a runtime config — a
+        browser-visible, origin-bound embed key that session creation only
+        accepts from Adam's own share-page origins. Owners enable it from the
+        console (Chat Widget → Public share chat). Returns `enabled: false`
+        when share chat is off or the installation is inactive.
+      parameters:
+        - name: configId
+          in: path
+          required: true
+          description: Runtime config id bound to the avatar.
+          schema: { type: string }
+      responses:
+        '200':
+          description: Share widget config
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  enabled: { type: boolean }
+                  installationId: { type: string }
+                  embedKey: { type: string, description: Browser-visible share key; origin-bound. }
+                  mode: { type: string, enum: [inline] }
+                  avatarName: { type: string, nullable: true }
   /v1/workspaces/{workspaceId}/usage:
     get:
       summary: Read embed usage for a workspace

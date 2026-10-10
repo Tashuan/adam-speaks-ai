@@ -29,6 +29,11 @@ Adam connects websites, applications, AI systems, and live experiences to a real
 - [CLI command reference](./cli/COMMAND_REFERENCE.md)
 - [Hosted registration flow](./cli/REGISTRATION_FLOW.md)
 
+## Running your avatar (console guides)
+
+- [Console guides index](./console/README.md) — owner-facing guides for the Admin Console: scene, outfits, voice, animations, sharing, connect, video producer, and account.
+- Live guides: https://adam-speaks.com/documentation (the "Run your avatar" section).
+
 ## API, architecture, and security
 
 - [Session lifecycle](./api/SESSION_LIFECYCLE.md)
