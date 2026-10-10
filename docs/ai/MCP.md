@@ -38,6 +38,7 @@ get_avatar                   read an avatar
 create_avatar_session        create a runtime session
 get_embed_code               script snippet + install recipe (+ optional widgetMode, chatWidget status)
 send_avatar_speech           send text to a session
+send_avatar_command          scene command to a connected embed (camera, background, lights, look-at, parallax, animation, expression, interrupt)
 interrupt_avatar_speech      interrupt current speech
 get_session_status           session state
 get_claim_status             ownership handoff state

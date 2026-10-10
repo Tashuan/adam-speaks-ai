@@ -497,6 +497,45 @@ paths:
           $ref: '#/components/responses/Error'
         '404':
           $ref: '#/components/responses/Error'
+  /v1/runtime-sessions/{sessionId}/command:
+    post:
+      summary: Send a scene command to a live embed session
+      description: >-
+        Remote-controls the avatar scene in a connected embed iframe — camera
+        position, background image/audio, lighting, look-at, motion parallax,
+        or an animation/expression. Commands are cosmetic: `speak` accepts
+        scene fields only (speech text stays on the metered speech endpoint),
+        payloads pass a strict server-side whitelist, and delivery requires the
+        iframe's live connection (`409 SESSION_STALE`, retryable, otherwise).
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RuntimeCommandRequest'
+      responses:
+        '200':
+          description: Queued command
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RuntimeCommandResponse'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '503':
+          $ref: '#/components/responses/Error'
   /v1/share/{configId}/widget:
     get:
       summary: Public share-page widget config
@@ -885,6 +924,36 @@ components:
         status: { type: string }
         displayText: { type: string }
         events: { type: array, items: { type: object, additionalProperties: true } }
+    RuntimeCommandRequest:
+      type: object
+      required: [command]
+      description: >-
+        `speak` payloads carry scene fields only: `cameraPos`
+        ({x,y,z,duration} | [x,y,z] | "x,y,z"), `duration`,
+        `backgroundUrl`/`backgroundAudioUrl` (http(s) URL, "" clears),
+        `backgroundAudioVolume` (0-1), `lights` (keyLight/fillLight/rimLight/
+        ambientLight/environment), `lookAt` (enabled, idleEnabled,
+        flipForward, stiffness, headWeight, eyesWeight, neckWeight,
+        spineWeight, waistWeight, hipWeight, neutralPitch, neutralYaw),
+        `motionParallaxEnabled`, `motionParallaxMode` ("auto"|"mouse").
+        `playAnimation` takes clipId/name/animation + optional loop;
+        `setExpression` takes name; `interrupt` takes an empty payload.
+        Unknown fields are dropped server-side.
+      properties:
+        command:
+          type: string
+          enum: [speak, playAnimation, setExpression, interrupt]
+        payload:
+          type: object
+          additionalProperties: true
+    RuntimeCommandResponse:
+      type: object
+      required: [sessionId, commandId, command, status]
+      properties:
+        sessionId: { type: string }
+        commandId: { type: string }
+        command: { type: string }
+        status: { type: string, enum: [queued] }
     ErrorResponse:
       type: object
       required: [error]
