@@ -16,6 +16,10 @@ The user opens the private URL and clicks Continue with Google. Adam verifies a 
 
 For a new account, the normal first-login flow creates the user profile and trial. For an existing account, the preview avatar is attached to that account. The existing workspace, avatar, and installation records are updated together, preserving their stable IDs.
 
+### Claiming inside the console
+
+If the user signs in to the Admin Console before completing the agent's link, the claim is not lost. The first-run dashboard offers a recovery field where the private authorization URL can be pasted to finish the Google claim, and avatars provisioned directly to the user's verified email are surfaced as a one-click claim card (`GET /v1/claims/mine` lists pending claims for the signed-in owner; `POST /v1/claims/{id}/complete` finishes them). Registration claims keyed to a placeholder email always require the private link — the console cannot discover them without it.
+
 ## Preview and production states
 
 Before claim, the embed can show the selected public avatar in bounded preview/mock mode. It has no access to account data, provider credentials, or live speech. A copied preview on an unauthorized origin cannot create a runtime session; any intentionally public static template assets remain non-account content. It cannot use the private claim URL or claim the installation.
