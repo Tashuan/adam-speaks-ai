@@ -618,7 +618,8 @@ paths:
         share-chat capability for the avatar bound to a runtime config — a
         browser-visible, origin-bound embed key that session creation only
         accepts from Adam's own share-page origins. Owners enable it from the
-        console (Chat Widget → Public share chat). Returns `enabled: false`
+        console (Overview → Where this avatar can appear → Public share chat).
+        Returns `enabled: false`
         when share chat is off or the installation is inactive.
       parameters:
         - name: configId
