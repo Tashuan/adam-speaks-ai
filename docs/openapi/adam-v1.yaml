@@ -431,6 +431,12 @@ paths:
   /v1/installations/{installationId}/sessions:
     post:
       summary: Create a short-lived runtime session
+      description: >-
+        Session creation enforces the workspace owner's plan: embed sessions
+        count against a monthly cap and `share`/`showcase` keys only work
+        while the plan includes hosted pages. Over-limit responses are 403
+        `ENTITLEMENT_DENIED` with `details.reason` `plan_quota_exceeded` or
+        `plan_upgrade_required`.
       parameters:
         - $ref: '#/components/parameters/InstallationId'
         - $ref: '#/components/parameters/Origin'
@@ -620,7 +626,8 @@ paths:
         accepts from Adam's own share-page origins. Owners enable it from the
         console (Overview → Where this avatar can appear → Public share chat).
         Returns `enabled: false`
-        when share chat is off or the installation is inactive.
+        when share chat is off, the installation is inactive, or the owner's
+        plan no longer includes hosted share pages.
       parameters:
         - name: configId
           in: path

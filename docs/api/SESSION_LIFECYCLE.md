@@ -23,3 +23,5 @@ Ending is idempotent: repeat `/end` calls return `alreadyEnded`. Ended sessions 
 ## Usage
 
 Embed activity is metered per workspace: session count/seconds, chat messages and tokens, and speech requests/characters. Agents can read daily totals via `GET /v1/workspaces/{workspaceId}/usage?days=N` — see `docs/openapi/adam-v1.yaml`.
+
+Session creation is also subject to the owner's plan: a monthly session-start cap returns `ENTITLEMENT_DENIED` with `details.reason: plan_quota_exceeded` when reached, and `share`/`showcase` keys are rejected with `plan_upgrade_required` when the owner's plan no longer includes hosted pages.

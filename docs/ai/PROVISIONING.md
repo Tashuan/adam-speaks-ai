@@ -21,3 +21,5 @@ The MCP server at `/api/mcp` exposes the same flow as tools. Anonymous `initiali
 Provisioning and resend email are rate-limited independently by target email, agent client, origin, IP, and global mail budget. Dynamic client registration has a separate per-fingerprint limit and can be disabled with `ADAM_DYNAMIC_AGENT_REGISTRATION_ENABLED=false`.
 
 Preview assets and mock behavior are bounded. Claimed installations enforce exact website origins and trial/subscription entitlements. An expired trial produces an inactive public widget state without a billing CTA; the owner reactivates from the authenticated Adam account.
+
+Plan tiers bound what a claimed owner can do: each tier carries an avatar quota and a trusted-origin cap enforced server-side (`402 PLAN_UPGRADE_REQUIRED` when exceeded), and monthly API/session quotas. Hosted public surfaces — share-page chat, the platform showcase — and media features such as depth and video backgrounds resolve per plan, so a downgrade degrades serving gracefully (share widgets return `enabled: false`, depth media falls back to the flat background) rather than deleting owner content.

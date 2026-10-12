@@ -13,5 +13,10 @@ MOCK_QUOTA_EXCEEDED RATE_LIMITED EMAIL_RATE_LIMITED
 IDEMPOTENCY_REQUIRED IDEMPOTENCY_CONFLICT SPEECH_INVALID
 PROVIDER_UNAVAILABLE PROVIDER_CREDENTIAL_MISMATCH
 CLAIM_NOT_FOUND CLAIM_EXPIRED CLAIM_ALREADY_COMPLETED
-CLAIM_NOT_ALLOWED INVALID_REQUEST INTERNAL_ERROR
+CLAIM_NOT_ALLOWED INVALID_REQUEST PLAN_UPGRADE_REQUIRED INTERNAL_ERROR
 ```
+
+Plan enforcement:
+
+- `PLAN_UPGRADE_REQUIRED` (HTTP 402) — the owner's subscription tier doesn't include the feature (e.g., avatar/origin limits, depth or video backgrounds, webhook registration, hosted share pages). `details` carries `{ feature, currentTier, requiredTier }`.
+- `ENTITLEMENT_DENIED` (HTTP 403) can also carry `details.reason` values `plan_quota_exceeded` (monthly embed session cap reached) or `plan_upgrade_required` (a `share`/`showcase` installation key is used after the plan drops below the tier that minted it).
